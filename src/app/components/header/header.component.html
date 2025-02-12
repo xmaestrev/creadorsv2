@@ -1,0 +1,48 @@
+<!-- src/app/components/header/header.component.html -->
+
+<!-- Usando Bootstrap .navbar + utilidades, y partes personalizadas -->
+<nav class="navbar navbar-expand-lg py-4" style="background-color: #221B7D;">
+  <div class="container-fluid">
+    <!-- LOGO / BRAND -->
+    <a class="navbar-brand text-white" routerLink="/">Creadors.TV</a>
+
+    <!-- Botón hamburguesa para colapsar en pantallas pequeñas -->
+    <button
+      class="navbar-toggler text-white"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+      style="border-color: #ffffff;"
+    >
+      <span class="navbar-toggler-icon" style="filter: invert(100%);"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!-- Menú de la izquierda -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/quienes-somos">Qui som?</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/hazte-socio">Fes-te'n soci/a</a>
+        </li>
+      </ul>
+
+      <!-- Menú derecho: categorías, buscador... -->
+      <form class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
+        <div>
+          <select class="form-select">
+            <option value="">Categories</option>
+            <!-- *ngFor para tus categorías si lo deseas -->
+          </select>
+        </div>
+        <div>
+          <input class="form-control" type="search" placeholder="Cercar" aria-label="Search">
+        </div>
+      </form>
+    </div>
+  </div>
+</nav>

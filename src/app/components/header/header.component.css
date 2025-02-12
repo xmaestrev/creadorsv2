@@ -1,0 +1,12 @@
+/* src/app/components/header/header.component.css */
+
+/* Ejemplo: si quieres forzar la navbar a sombra, etc. */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+  font-size: 2rem;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+}

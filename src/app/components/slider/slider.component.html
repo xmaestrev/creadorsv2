@@ -1,0 +1,36 @@
+<div class="slider-container">
+    <!-- Cabecera del slider: mostramos el título -->
+    <div class="slider-header" *ngIf="title">
+      <h2>{{ title }}</h2>
+    </div>
+  
+    <!-- p-carousel de PrimeNG -->
+    <p-carousel 
+      [value]="items" 
+      [numVisible]="numVisible" 
+      [numScroll]="numScroll"
+      [responsiveOptions]="responsiveOptions"
+      [circular]="circular"
+      [autoplayInterval]="autoplayInterval"
+      styleClass="custom-carousel"
+    >
+      <!-- Plantilla de cada item -->
+      <ng-template pTemplate="item" let-item>
+        <div class="item-card">
+          <div class="card h-100">
+            <img 
+              [src]="item.thumbnail || 'https://idpeople.es/wp-content/themes/consultix/images/no-image-found-360x250.png'" 
+              class="card-img-top"
+              alt="Video thumbnail"
+            >
+            <div class="card-body">
+              <h5 class="card-title">{{ item.title }}</h5>
+              <p class="text-muted">{{ item.creator }}</p>
+              <!-- ... tu contenido adicional ... -->
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-carousel>
+  </div>
+  

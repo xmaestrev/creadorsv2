@@ -1,0 +1,7 @@
+.home-container {
+  width: 90%;             /* Ocupa el 90% */
+  max-width: 1900px;      /* Un tope alto, p.ej. 1900 o 2000px */
+  margin: 0 auto;
+  padding: 1rem;
+  position: relative;      /* si necesitas posicionar algo */
+}
