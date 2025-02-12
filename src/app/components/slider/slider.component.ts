@@ -30,5 +30,8 @@ export class SliderComponent {
   /** Autoplay interval en ms (0 = sin autoplay) */
   @Input() autoplayInterval: number = 0;
 
+  /** Autoplay interval en ms (0 = sin autoplay) */
+  @Input() showIndicators: boolean = true;
+
   // Puedes añadir más @Input() si deseas controlar p-carousel
 }

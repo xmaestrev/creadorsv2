@@ -28,7 +28,7 @@
   
   .item-card .card-img-top {
     object-fit: cover;
-    height: 240px; /* Ajusta a tu gusto */
+    height: 240px!important; /* Ajusta a tu gusto */
     width: 100%;
   }
   

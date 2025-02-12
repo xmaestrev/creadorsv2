@@ -1,36 +1,80 @@
+<!-- slider.component.html -->
 <div class="slider-container">
-    <!-- Cabecera del slider: mostramos el título -->
-    <div class="slider-header" *ngIf="title">
-      <h2>{{ title }}</h2>
-    </div>
-  
-    <!-- p-carousel de PrimeNG -->
-    <p-carousel 
-      [value]="items" 
-      [numVisible]="numVisible" 
-      [numScroll]="numScroll"
-      [responsiveOptions]="responsiveOptions"
-      [circular]="circular"
-      [autoplayInterval]="autoplayInterval"
-      styleClass="custom-carousel"
-    >
-      <!-- Plantilla de cada item -->
-      <ng-template pTemplate="item" let-item>
-        <div class="item-card">
-          <div class="card h-100">
-            <img 
-              [src]="item.thumbnail || 'https://idpeople.es/wp-content/themes/consultix/images/no-image-found-360x250.png'" 
+  <!-- Cabecera del slider: mostramos el título si existe -->
+  <div class="slider-header" *ngIf="title">
+    <h2>{{ title }}</h2>
+  </div>
+
+  <!-- p-carousel de PrimeNG con indicadores activados -->
+  <p-carousel
+    [value]="items"
+    [numVisible]="numVisible"
+    [numScroll]="numScroll"
+    [responsiveOptions]="responsiveOptions"
+    [circular]="circular"
+    [autoplayInterval]="autoplayInterval"
+    [showIndicators]="showIndicators"
+
+    indicatorsContentClass="line-indicators"
+    styleClass="custom-carousel"
+  >
+    <!-- Plantilla de cada item -->
+    <ng-template pTemplate="item" let-item>
+      <div class="item-card">
+        <div class="card position-relative">
+          <!-- Bloque imagen con 'EN DIRECTE' y duración -->
+          <div class="position-relative">
+            <img
+              [src]="item.thumbnail || 'https://idpeople.es/wp-content/themes/consultix/images/no-image-found-360x250.png'"
               class="card-img-top"
               alt="Video thumbnail"
+              style="object-fit: cover; width: 100%; height: 180px;"
             >
-            <div class="card-body">
-              <h5 class="card-title">{{ item.title }}</h5>
-              <p class="text-muted">{{ item.creator }}</p>
-              <!-- ... tu contenido adicional ... -->
+
+            <!-- Etiqueta 'EN DIRECTE' -->
+            <span 
+              *ngIf="item.isLive" 
+              class="badge bg-danger position-absolute top-0 start-0 m-2"
+            >
+              EN DIRECTE
+            </span>
+
+            <!-- Duración (ej. '3:15:08') -->
+            <span 
+              *ngIf="item.duration" 
+              class="badge bg-dark position-absolute bottom-0 end-0 m-2"
+            >
+              {{ item.duration }}
+            </span>
+          </div>
+
+          <!-- Contenido de la tarjeta -->
+          <div class="card-body">
+            <!-- Título -->
+            <h5 class="card-title mb-1">{{ item.title }}</h5>
+            <!-- Nombre del creador -->
+            <p class="text-muted mb-1">{{ item.creator }}</p>
+
+            <!-- Categorías (array de strings) -->
+            <div class="mb-2">
+              <span 
+                class="badge bg-secondary me-1"
+                *ngFor="let cat of item.categories"
+              >
+                {{ cat }}
+              </span>
             </div>
+
+            <!-- Descripción, truncada a 2 líneas -->
+            <p
+              class="card-text"
+              style="-webkit-line-clamp: 2; -webkit-box-orient: vertical; display: -webkit-box; overflow: hidden;"
+            >
+              {{ item.description }}
+            </p>
           </div>
         </div>
-      </ng-template>
-    </p-carousel>
-  </div>
-  
+      </div>
+    </ng-template>
+  </p-carousel>
+</div>

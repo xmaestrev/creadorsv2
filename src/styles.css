@@ -5,3 +5,26 @@ body {
     margin: 0;
     font-family: sans-serif;
   }
+
+/* Aplica estilos al contenedor de indicadores */
+.line-indicators {
+  /* si quieres centrarlo o darle margen */
+  display: flex;
+  justify-content: center; 
+  margin-top: 1rem!important;
+}
+
+/* Aplica estilos a cada indicador individual (li) */
+.line-indicators .p-carousel-indicator {
+  width: 30px;
+  height: 4px;
+  background-color: #ccc;
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+/* Indicador activo */
+.p-carousel-indicator-active{
+  background-color: #221B7D!important;
+}
+
