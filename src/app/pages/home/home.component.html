@@ -1,35 +1,36 @@
-<div class="home-container">
-  <app-slider 
-    [title]="'Canals en directe'" 
+<div class="custom-container mt-4">
+  
+  <!-- 🔴 Canales en Directo -->
+  <h2 class="mb-3">📡 En Directe</h2>
+  <app-slider
+    *ngIf="!isLoading; else skeletonLoader"
+    [title]="'Canales en Directo'"
     [items]="liveChannels"
     [numVisible]="4"
     [numScroll]="1"
-    [responsiveOptions]="responsiveOptions"
-    [circular]="true"
-    [autoplayInterval]="0"
-    [showIndicators]="true"
-  >
-  </app-slider>
-  <app-slider 
-  [title]="'Canals en directe'" 
-  [items]="liveChannels"
-  [numVisible]="4"
-  [numScroll]="1"
-  [responsiveOptions]="responsiveOptions"
-  [circular]="true"
-  [autoplayInterval]="0"
-  [showIndicators]="true"
->
-</app-slider>
-<app-slider 
-[title]="'Canals en directe'" 
-[items]="liveChannels"
-[numVisible]="4"
-[numScroll]="1"
-[responsiveOptions]="responsiveOptions"
-[circular]="true"
-[autoplayInterval]="0"
-[showIndicators]="true"
->
-</app-slider>
+  ></app-slider>
+
+  <!-- ⭐️ Videos Destacados (Últimos de YouTube) -->
+  <h2 class="mb-3">⭐️ Vídeos Destacats</h2>
+  <app-slider
+    *ngIf="!isLoading; else skeletonLoader"
+    [title]="'Destacats'"
+    [items]="featuredVideos"
+    [numVisible]="4"
+    [numScroll]="1"
+  ></app-slider>
+
+  <!-- Skeleton Loader -->
+  <ng-template #skeletonLoader>
+    <div class="row">
+      <div *ngFor="let i of [1,2,3,4]" class="col-md-3 mb-3">
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
 </div>

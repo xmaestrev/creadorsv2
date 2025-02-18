@@ -1,0 +1,81 @@
+<div class="custom-container mt-4">
+  <h2 class="category-header mb-5">🎥 Vídeos de la categoría {{ categoryTitle || categoryId }}</h2>
+
+  <!-- Filtros -->
+  <div class="filters d-flex justify-content-end mb-4 gap-2">
+    <!-- Filtro de plataforma -->
+    <select [(ngModel)]="platformFilter" (change)="applyFilters()" class="form-select">
+      <option value="" disabled selected>Filtrar plataforma</option>
+      <option value="all">Tots</option>
+      <option value="twitch">Twitch</option>
+      <option value="youtube">YouTube</option>
+    </select>
+  
+    <!-- Filtro de data -->
+    <select [(ngModel)]="orderFilter" (change)="applyFilters()" class="form-select">
+      <option value="" disabled selected>Filtrar data</option>
+      <option value="recent">Més recent</option>
+      <option value="oldest">Més antic</option>
+    </select>
+  
+    <!-- Filtro específico de Twitch (solo se muestra si NO es YouTube) -->
+    <ng-container *ngIf="platformFilter !== 'youtube'">
+      <select [(ngModel)]="twitchTypeFilter" (change)="applyFilters()" class="form-select">
+        <option value="" disabled selected>Filtrar tipus de vídeo</option>
+        <option value="all">Tots</option>
+        <option value="clip">Clips</option>
+        <option value="emission">Emissions anteriors</option>
+      </select>
+    </ng-container>
+  </div>
+  
+  
+
+  <!-- Skeleton Loader mientras carga -->
+  <div class="row" *ngIf="isLoading">
+    <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-title"></div>
+        <div class="skeleton-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje si no hay videos -->
+  <div *ngIf="!isLoading && videos.length === 0" class="no-videos-message text-center">
+    <p>No hay videos para esta categoría</p>
+  </div>
+
+  <!-- Grid de videos -->
+  <div class="row" *ngIf="!isLoading && videos.length > 0">
+    <div *ngFor="let video of videos" class="col-md-3 mb-3">
+      <a (click)="navigateToVideo(video.url, video.creatorId)" class="video-link" style="text-decoration: none; color: inherit;">
+        <div class="card position-relative">
+          <!-- Imagen y etiquetas -->
+          <div class="position-relative img-container">
+            <img
+              [src]="video.thumbnail || 'https://idpeople.es/wp-content/themes/consultix/images/no-image-found-360x250.png'"
+              class="card-img-top"
+              alt="Video thumbnail"
+            >
+            <span *ngIf="video.duration" class="badge bg-dark position-absolute bottom-0 end-0 m-2">
+              {{ video.duration }}
+            </span>
+          </div>
+          <!-- Contenido de la card -->
+          <div class="card-body">
+            <h5 class="card-title">{{ video.title }}</h5>
+            <p class="text-muted mb-1 creator-name">{{ video.creator }}</p>
+            <div *ngIf="video.categories && video.categories.length" class="mb-2">
+              <span *ngFor="let cat of video.categories" class="badge bg-secondary me-1">
+                {{ cat }}
+              </span>
+            </div>
+            <p class="card-text">{{ video.description }}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

@@ -34,10 +34,12 @@
       <!-- Menú derecho: categorías, buscador... -->
       <form class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
         <div>
-          <select class="form-select">
-            <option value="">Categories</option>
-            <!-- *ngFor para tus categorías si lo deseas -->
-          </select>
+          <select class="form-select me-2" (change)="onCategoryChange($event)">
+            <option value="" selected>Totes les categories</option>
+            <option *ngFor="let category of categories" [value]="category.categoryId">
+              {{ category.title }}
+            </option>
+          </select>          
         </div>
         <div>
           <input class="form-control" type="search" placeholder="Cercar" aria-label="Search">

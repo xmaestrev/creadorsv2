@@ -1,34 +1,80 @@
 .slider-container {
-    margin-bottom: 2rem;
-  }
-  
-  .slider-header {
-    margin-bottom: 1rem;
-  }
-  
-  .custom-carousel .p-carousel-content {
-    /* Ejemplo: padding extra, fondo, etc. */
-    padding: 1rem;
-  }
-  
-  .custom-carousel .p-carousel-prev,
-  .custom-carousel .p-carousel-next {
-    /* Ajusta estilo de flechas */
-    background-color: #fff;
-    border-radius: 50%;
-    border: 1px solid #ddd;
-    opacity: 0.9;
-  }
-  
-  .item-card {
-    padding: 0.5rem;
-    /* Ajusta el ancho si deseas */
-    box-sizing: border-box;
-  }
-  
-  .item-card .card-img-top {
-    object-fit: cover;
-    height: 240px!important; /* Ajusta a tu gusto */
-    width: 100%;
-  }
-  
+  margin-bottom: 2rem;
+}
+
+.slider-header {
+  margin-bottom: 1rem;
+}
+
+.custom-carousel .p-carousel-content {
+  padding: 1rem;
+}
+
+.custom-carousel .p-carousel-prev,
+.custom-carousel .p-carousel-next {
+  background-color: #fff;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  opacity: 0.9;
+}
+
+.item-card {
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.item-card .card-img-top {
+  object-fit: cover;
+  height: 240px !important;
+  width: 100%;
+}
+
+/* Estilo uniforme para las tarjetas */
+.card {
+  height: 100%; /* Asegurar que todas las tarjetas tengan la misma altura */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor del texto dentro de la tarjeta */
+.card-body {
+  flex-grow: 1; /* Hace que el contenido ocupe el espacio necesario */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Limitar título a 2 líneas */
+.card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.5rem; /* Mantener altura uniforme */
+  color: #221B7D;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+}
+
+/* Limitar descripción a 2 líneas */
+.card-text {
+  font-size: 0.9rem;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.7rem; /* Mantener altura uniforme */
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+.creator-name{
+  color: #221B7D!important;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+}

@@ -1,18 +1,21 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CarouselModule } from 'primeng/carousel';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-slider',
     templateUrl: './slider.component.html',
     styleUrls: ['./slider.component.css'],
+    standalone: true,
     imports: [CommonModule, CarouselModule]
 })
 export class SliderComponent {
+  
   /** Título que aparece encima del carrusel */
   @Input() title: string = '';
 
-  /** Datos a mostrar, por ejemplo un array de objetos con thumbnail, título, etc. */
+  /** Datos a mostrar en el carrusel (se pasan desde el padre) */
   @Input() items: any[] = [];
 
   /** Cuántos ítems se ven en pantallas grandes */
@@ -21,17 +24,28 @@ export class SliderComponent {
   /** Cuántos ítems avanza por cada flecha */
   @Input() numScroll: number = 1;
 
-  /** Opciones responsivas, para adaptar numVisible y numScroll a distintos breakpoints */
+  /** Opciones responsivas */
   @Input() responsiveOptions: any;
 
-  /** ¿Hacer el carrusel circular? (vuelve al inicio) */
+  /** ¿Hacer el carrusel circular? */
   @Input() circular: boolean = true;
 
-  /** Autoplay interval en ms (0 = sin autoplay) */
+  /** Autoplay interval en ms */
   @Input() autoplayInterval: number = 0;
 
-  /** Autoplay interval en ms (0 = sin autoplay) */
+  /** Mostrar indicadores en el carrusel */
   @Input() showIndicators: boolean = true;
 
-  // Puedes añadir más @Input() si deseas controlar p-carousel
+  constructor(private router: Router) {}
+
+  /** Método para navegar a un video */
+  navigateToVideo(videoUrl: string, creatorId: string): void {
+    if (videoUrl.includes('youtube')) {
+      this.router.navigate(['/video'], {
+        queryParams: { videoID: videoUrl.split('v=')[1], creatorId }
+      });
+    } else {
+      window.open(videoUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
 }
