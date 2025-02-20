@@ -1,7 +1,4 @@
-<!-- src/app/components/header/header.component.html -->
-
-<!-- Usando Bootstrap .navbar + utilidades, y partes personalizadas -->
-<nav class="navbar navbar-expand-lg py-4" style="background-color: #221B7D;">
+<nav class="navbar navbar-expand-lg py-4" style="background-color: #221b7d">
   <div class="container-fluid">
     <!-- LOGO / BRAND -->
     <a class="navbar-brand text-white" routerLink="/">Creadors.TV</a>
@@ -15,34 +12,44 @@
       aria-controls="navbarSupportedContent"
       aria-expanded="false"
       aria-label="Toggle navigation"
-      style="border-color: #ffffff;"
+      style="border-color: #ffffff"
     >
-      <span class="navbar-toggler-icon" style="filter: invert(100%);"></span>
+      <span class="navbar-toggler-icon" style="filter: invert(100%)"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <!-- Menú de la izquierda -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link text-white" routerLink="/quienes-somos">Qui som?</a>
+          <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/qui-som/">Qui som?</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" routerLink="/hazte-socio">Fes-te'n soci/a</a>
+          <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/alta-socis/">Fes-te'n soci/a</a>
         </li>
       </ul>
 
-      <!-- Menú derecho: categorías, buscador... -->
+      <!-- Menú dret: select de categories i buscador -->
       <form class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
         <div>
-          <select class="form-select me-2" (change)="onCategoryChange($event)">
+          <!-- Select amb ngModel per mostrar la categoria actual -->
+          <select class="form-select me-2" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)" name="categoria">
             <option value="" selected>Totes les categories</option>
             <option *ngFor="let category of categories" [value]="category.categoryId">
               {{ category.title }}
             </option>
-          </select>          
+          </select>
         </div>
         <div>
-          <input class="form-control" type="search" placeholder="Cercar" aria-label="Search">
+          <input
+            type="text"
+            [(ngModel)]="searchText"
+            name="searchText"
+            placeholder="Cercar..."
+            class="form-control"
+          >
+        </div>
+        <div>
+          <button type="button" (click)="goToCercar()" class="btn btn-primary">Cercar</button>
         </div>
       </form>
     </div>

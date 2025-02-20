@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -28,15 +28,13 @@ export interface Video {
   title?: string;
   description?: string;
   url?: string;
-  thumbnail_url?: string;  // <-- Agregar esta propiedad
+  thumbnail_url?: string; // <-- Agregar esta propiedad
   duration?: string;
   creatorName?: string;
   autor?: string;
   view_count?: number;
   categories?: string[];
 }
-
-
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +45,6 @@ export class CreatorsService {
   private baseUrl = 'http://localhost:3000/api';
 
   private cachedCategories: any[] | null = null;
-
 
   constructor(private http: HttpClient) {}
 
@@ -119,12 +116,52 @@ export class CreatorsService {
       // Devolvemos la cache en un observable
       return of(this.cachedCategories);
     } else {
-      return this.http.get<any[]>(`${this.baseUrl}/categories/`)
-        .pipe(
-          tap((categories) => {
-            this.cachedCategories = categories;
-          })
-        );
+      return this.http.get<any[]>(`${this.baseUrl}/categories/`).pipe(
+        tap((categories) => {
+          this.cachedCategories = categories;
+        })
+      );
     }
   }
+  // ------------------------------------------
+  // BÚSQUEDA
+  // ------------------------------------------
+  /**
+   * Realiza una búsqueda utilizando el endpoint /cerca/ pasando los parámetros por GET.
+   * Parámetros:
+   * - text: string para buscar en sobrenom y descripción de un creador o título y descripción de un vídeo.
+   * - type: array con los valores 'creadors' y/o 'vídeos'.
+   * - platform: array con los valores 'twitch' y/o 'youtube'.
+   * - categoria: array con los IDs de categorías para filtrar.
+   */
+  search(query: {
+    text?: string;
+    type?: string[];
+    platform?: string[];
+    categoria?: string[];
+  }): Observable<any> {
+    let params = new HttpParams();
+    if (query.text) {
+      params = params.set('text', query.text);
+    }
+    if (query.type && query.type.length > 0) {
+      query.type.forEach((val) => {
+        params = params.append('type[]', val);
+      });
+    }
+    if (query.platform && query.platform.length > 0) {
+      query.platform.forEach((val) => {
+        params = params.append('platform[]', val);
+      });
+    }
+    if (query.categoria && query.categoria.length > 0) {
+      query.categoria.forEach((val) => {
+        params = params.append('categoria[]', val);
+      });
+    }
+    const url = `${this.baseUrl}/cerca/?${params.toString()}`;
+    console.log('URL de cerca:', url);
+    return this.http.get<any>(`${this.baseUrl}/cerca/`, { params });
+  }
+  
 }

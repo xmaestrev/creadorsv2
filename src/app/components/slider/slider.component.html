@@ -18,7 +18,7 @@
   >
     <!-- Plantilla de cada item -->
     <ng-template pTemplate="item" let-item>
-      <div class="item-card">
+      <div class="item-card" (click)="navigateToVideo(item.url, item.creatorId)" style="cursor: pointer;">
         <div class="card position-relative">
           <!-- Imagen y etiquetas -->
           <div class="position-relative">
@@ -27,12 +27,10 @@
               class="card-img-top"
               alt="Video thumbnail"
             >
-
             <!-- Etiqueta 'EN DIRECTE' (solo si el video es en vivo) -->
             <span *ngIf="item.isLive" class="badge bg-danger position-absolute top-0 start-0 m-2">
               EN DIRECTE
             </span>
-
             <!-- Duración (si existe) -->
             <span *ngIf="item.duration" class="badge bg-dark position-absolute bottom-0 end-0 m-2">
               {{ item.duration }}
@@ -43,17 +41,14 @@
           <div class="card-body">
             <!-- Título (máximo 2 líneas) -->
             <h5 class="card-title">{{ item.title }}</h5>
-
             <!-- Nombre del creador -->
             <p class="text-muted mb-1 creator-name">{{ item.creator }}</p>
-
             <!-- Categorías -->
             <div class="mb-2">
               <span class="badge bg-secondary me-1" *ngFor="let cat of item.categories">
                 {{ cat }}
               </span>
             </div>
-
             <!-- Descripción (máximo 2 líneas) -->
             <p class="card-text">
               {{ item.description }}

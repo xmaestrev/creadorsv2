@@ -41,11 +41,16 @@ export class SliderComponent {
   /** Método para navegar a un video */
   navigateToVideo(videoUrl: string, creatorId: string): void {
     if (videoUrl.includes('youtube')) {
-      this.router.navigate(['/video'], {
-        queryParams: { videoID: videoUrl.split('v=')[1], creatorId }
-      });
+      // Navega a la ruta /video pasando el videoID (extraído de la URL) y el creatorId
+      const videoID = videoUrl.split('v=')[1];
+      this.router.navigate(['/video'], { queryParams: { videoID, creatorId } });
+    } else if (videoUrl.includes('twitch')) {
+      // Si es de Twitch (clip o emisión), abrir el enlace en una nueva pestaña
+      window.open(videoUrl, '_blank', 'noopener,noreferrer');
     } else {
+      // En cualquier otro caso, abrir en nueva pestaña
       window.open(videoUrl, '_blank', 'noopener,noreferrer');
     }
   }
+  
 }

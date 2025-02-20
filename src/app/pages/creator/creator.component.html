@@ -1,0 +1,29 @@
+<div class="creator-container" *ngIf="!isLoading && creator">
+    <!-- Información del creador -->
+    <div class="text-center mb-5">
+      <img [src]="creator.imageUrl && creator.imageUrl.trim() !== '' ? creator.imageUrl : 'assets/img/default-creator-profile.png'"
+           alt="Imagen del creador"
+           class="creator-image mb-3">
+      <h2 class="creator-name">{{ creator.name || 'NomCreador/a' }}</h2>
+      <p class="creator-description">
+        {{ creator.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...' }}
+      </p>
+    </div>
+  
+    <!-- Sección de vídeos utilizando el SliderComponent en grid mode -->
+    <div class="videos-section">
+      <app-slider [title]="'Vídeos'"
+                  [items]="firstVideos"
+                  [numVisible]="4"
+                  [numScroll]="1">
+      </app-slider>
+      <div class="text-end">
+        <a href="#" (click)="viewAllVideos()">Veure tots</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- <div class="text-center" *ngIf="isLoading">
+    <p>Carregant creador...</p>
+  </div> -->
+  

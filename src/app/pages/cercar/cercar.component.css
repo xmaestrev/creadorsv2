@@ -1,0 +1,97 @@
+.custom-container {
+  margin-left: 3em;
+  margin-right: 3em;
+}
+
+.category-header {
+  margin-bottom: 1rem;
+  font-family: 'Roboto', sans-serif;
+  color: #221B7D;
+  font-weight: 700;
+}
+
+.no-videos-message,
+.no-creators-message {
+  color: #aaa;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+}
+
+/* Estils de les targetes de vídeos (similars als del slider) */
+.card-img-top {
+  object-fit: cover;
+  height: 240px !important;
+  width: 100%;
+}
+
+.card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.5rem;
+  color: #221B7D;
+  font-family: 'Roboto', sans-serif;
+}
+
+.card-text {
+  font-size: 0.9rem;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.7rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+.creator-card {
+  cursor: pointer;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  transition: box-shadow 0.2s ease-in-out;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.creator-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.creator-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+}
+
+.creator-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #221B7D;
+  margin: 0;
+}
+
+.filters .form-select {
+  width: 200px;
+}

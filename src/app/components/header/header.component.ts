@@ -1,48 +1,57 @@
 import { Component, OnInit } from '@angular/core';
 import { CreatorsService } from '../../services/creators.service';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-    selector: 'app-header',
-    imports: [CommonModule],
-    templateUrl: './header.component.html',
-    styleUrl: './header.component.css'
+  selector: 'app-header',
+  imports: [CommonModule, RouterModule, FormsModule],
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.css',
 })
 export class HeaderComponent implements OnInit {
+  categories: any[] = [];
+  selectedCategory: string = '';
+  searchText: string = '';
 
-    categories: any[] = [];
+  constructor(
+    private creatorsService: CreatorsService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
-    constructor(private creatorsService: CreatorsService, private router: Router) {}
-  
-    ngOnInit(): void {
-      this.loadCategories();
+  ngOnInit(): void {
+    this.loadCategories();
+    // Actualizamos el select amb el valor del query param "categoria"
+    this.route.queryParams.subscribe(params => {
+      this.selectedCategory = params['categoria'] || '';
+    });
+  }
+
+  loadCategories(forceRefresh = false): void {
+    this.creatorsService.getCategories(forceRefresh).subscribe({
+      next: (cats) => {
+        this.categories = cats;
+        console.log('Categorías cargadas:', this.categories);
+      },
+      error: (err) => {
+        console.error('Error al cargar categorías', err);
+      },
+    });
+  }
+
+  onCategoryChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const selectedCategory = target.value;
+    if (!selectedCategory) {
+      this.router.navigate(['/cercar']);
+    } else {
+      this.router.navigate(['/cercar'], { queryParams: { categoria: selectedCategory } });
     }
-  
-    loadCategories(forceRefresh = false) {
-      this.creatorsService.getCategories(forceRefresh).subscribe({
-        next: (cats) => {
-          this.categories = cats;
-          console.log('Categorías cargadas:', this.categories);
-        },
-        error: (err) => {
-          console.error('Error al cargar categorías', err);
-        },
-      });
-    }
+  }
 
-    onCategoryChange(event: Event) {
-        const target = event.target as HTMLSelectElement;
-        const categoryId = target.value;
-      
-        if (!categoryId) {
-          // Si no hay categoría seleccionada, redirige a la Home
-          this.router.navigate(['/']);
-        } else {
-          // Si hay categoría seleccionada, redirige a la página de esa categoría
-          this.router.navigate(['/categorias', categoryId]);
-        }
-      }
-      
-      
+  goToCercar(): void {
+    this.router.navigate(['/cercar'], { queryParams: { text: this.searchText } });
+  }
 }
