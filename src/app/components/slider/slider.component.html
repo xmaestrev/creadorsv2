@@ -42,7 +42,7 @@
             <!-- Título (máximo 2 líneas) -->
             <h5 class="card-title">{{ item.title }}</h5>
             <!-- Nombre del creador -->
-            <p class="text-muted mb-1 creator-name">{{ item.creator }}</p>
+            <p (click)="navigateToCreator(item.creatorId)" class="text-muted mb-1 creator-name">{{ item.creator }}</p>
             <!-- Categorías -->
             <div class="mb-2">
               <span class="badge bg-secondary me-1" *ngFor="let cat of item.categories">

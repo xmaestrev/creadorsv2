@@ -1,0 +1,311 @@
+// PONER EN TODAS LAS CARDS EL NOMBRE CON EL CREADOR Y AL HACER CLICK, SE VA AL PERFIL DEL CREADOR
+// REVIDAR EL FLUJO DE LOS FILTROS
+
+
+// EL BOTON DE VER TODOS LOS VIDEOS EN LA PAGINA DEL CREADOR, HA DE SER UN ENLACE A LOS FILTROS
+
+
+DOCUMENTO: ENDPOINTS DEL PROYECTO CREADORS.TV
+
+================================================================================
+1. INFORMACIÓN DEL CREADOR
+================================================================================
+
+Descripción:
+-----------
+Estos endpoints proporcionan la información de un creador concreto (identificado por su ID interno) o la de todos los creadores.
+
+Rutas:
+------
+• Obtener creador específico:
+    GET https://www.creadors.tv/api/creadors/{id}/
+    Ejemplo: https://www.creadors.tv/api/creadors/1/
+
+• Obtener todos los creadores:
+    GET https://www.creadors.tv/api/creadors/
+
+Estructura de la respuesta:
+---------------------------
+{
+  "creatorId": "string",
+  "name": "string",
+  "description": "string",
+  "imageUrl": "string",
+  "linked_channels": [
+    {
+      "type": "string",
+      "channelId": "string",
+      "url": "string",
+      "user": "string",
+      "description": "string",
+      "clips": [ ],
+      "videos": [ ]
+    }
+    // ... más canales
+  ]
+}
+
+Observación:
+-----------
+Cada creador puede contener uno o varios canales vinculados (twitch, youtube…).
+
+
+================================================================================
+2. CANALES VINCULADOS Y CONTENIDO POR RED
+================================================================================
+
+2.1. Twitch
+-----------
+Para Twitch, en linked_channels se pueden incluir:
+• clips (máximo 10 por usuario)
+• videos
+
+Estructura de un clip de Twitch:
+{
+  "id": "string",
+  "url": "string",
+  "embed_url": "string",
+  "broadcaster_id": "string",
+  "broadcaster_name": "string",
+  "creator_id": "string",
+  "creator_name": "string",
+  "video_id": "string",
+  "game_id": "string",
+  "language": "string",
+  "title": "string",
+  "view_count": number,
+  "created_at": "datetime",
+  "thumbnail_url": "string",
+  "duration": float,
+  "vod_offset": "string",
+  "is_featured": boolean
+}
+
+Estructura de un video de Twitch:
+{
+  "id": "string",
+  "stream_id": "string",
+  "user_id": "string",
+  "user_login": "string",
+  "user_name": "string",
+  "title": "string",
+  "description": "string",
+  "created_at": "datetime",
+  "published_at": "datetime",
+  "url": "string",
+  "thumbnail_url": "string",
+  "viewable": "string",
+  "view_count": number,
+  "language": "string",
+  "type": "string",
+  "duration": "string",
+  "muted_segments": "string"
+}
+
+
+2.2. YouTube
+------------
+Para YouTube, el contenido se representa en la clave "videos" (en lugar de “clips”).
+
+Ejemplo de video de YouTube:
+{
+  "kind": "string",
+  "etag": "string",
+  "id": "string",
+  "snippet": {
+    "publishedAt": "date",
+    "channelId": "string",
+    "title": "string",
+    "description": "string",
+    "thumbnails": {
+      "default": {"url": "string", "width": number, "height": number},
+      "medium": {"url": "string", "width": number, "height": number},
+      "high": {"url": "string", "width": number, "height": number},
+      "standard": {"url": "string", "width": number, "height": number},
+      "maxres": {"url": "string", "width": number, "height": number}
+    },
+    "channelTitle": "string",
+    "playlistId": "string",
+    "position": number,
+    "resourceId": {
+      "kind": "string",
+      "videoId": "string"
+    },
+    "videoOwnerChannelTitle": "string",
+    "videoOwnerChannelId": "string"
+  },
+  "status": {
+    "privacyStatus": "string"
+  }
+}
+
+Observación:
+-----------
+El id real del video se encuentra en snippet.resourceId.videoId.
+
+
+================================================================================
+3. ENDPOINT DE VIDEOS
+================================================================================
+
+Contiene más información unificada de videos. Hay tres variantes principales:
+
+3.1. Últimos por plataforma
+---------------------------
+• Twitch:
+  GET https://www.creadors.tv/api/videos/ultims/twitch/
+  Devuelve objetos con esta estructura:
+  {
+    "video_id": "string",
+    "stream_id": "string",
+    "creatorId": "string",
+    "twitch_user_id": "string",
+    "twitch_user_name": "string",
+    "url": "string",
+    "created_at": "date",
+    "published_at": "date",
+    "type": "string",
+    "thumbnail_url": "string",
+    "view_count": number,
+    "duration": "string"
+  }
+  
+• YouTube:
+  GET https://www.creadors.tv/api/videos/ultims/youtube/
+  Estructura de la respuesta:
+  {
+    "video_id": "string",
+    "channel_id": "string",
+    "creatorId": "string",
+    "title": "string",
+    "description": "string",
+    "youtube_channel_id": "string",
+    "youtube_channel_name": "string",
+    "url": "string",
+    "playlist_id": "string",
+    "published_at": "date",
+    "thumbnail_url": "string"
+  }
+
+3.2. Vídeos por categoría
+-------------------------
+• Twitch:  
+  GET https://www.creadors.tv/api/videos/categoria/{id}/twitch/
+• YouTube:  
+  GET https://www.creadors.tv/api/videos/categoria/{id}/youtube/
+
+Donde {id} es el ID interno de la categoría.
+
+3.3. Vídeos Destacados
+----------------------
+Pendiente de implementar en el futuro.
+
+
+================================================================================
+4. DIRECTES
+================================================================================
+
+Descripción:
+-----------
+Endpoint para saber quién está en directo en Twitch en el momento actual.
+
+Ruta:
+-----
+GET https://www.creadors.tv/api/directes/twitch/
+
+Estructura de respuesta:
+-----------------------
+{
+  "id": "string",
+  "user_id": "string",
+  "user_login": "string",
+  "user_name": "string",
+  "game_id": "string",
+  "game_name": "string",
+  "type": "string",
+  "title": "string",
+  "viewer_count": "string",
+  "started_at": "date",
+  "language": "string",
+  "thumbnail_url": "string",
+  "tags_ids": [],
+  "tags": [],
+  "is_mature": boolean,
+  "creatorId": number
+}
+
+Observación:
+-----------
+creatorId es el identificador interno propio del sistema.
+
+
+================================================================================
+5. CATEGORIAS
+================================================================================
+
+Descripción:
+-----------
+Lista de categorías disponibles en el sistema.
+
+Ruta:
+-----
+GET https://www.creadors.tv/api/categories/
+
+Estructura de la respuesta:
+--------------------------
+{
+  "categoryId": "string",
+  "title": "string"
+}
+
+
+================================================================================
+6. BUSCADOR / ENDPOINT DE CERCA
+================================================================================
+
+Descripción:
+-----------
+Permite buscar tanto creadores como vídeos, filtrando opcionalmente por categorías y/o plataforma.
+
+Ruta:
+-----
+GET https://www.creadors.tv/api/cerca/
+
+Parámetros (GET o POST):
+------------------------
+• text (string): buscará en nombre/description de creador o título/description de vídeo.  
+• type (array): "creadors" y/o "videos".  
+  - type[]=creadors (solo creadores)
+  - type[]=videos (solo videos)
+  - type[]=creadors&type[]=videos (ambos)
+• platform (array): "twitch" y/o "youtube"  
+• categoria (array): IDs internos de categoría para filtrar  
+  - ?type[]=creadors&type[]=videos&categoria[]=2  
+
+Ejemplos:
+---------
+• https://www.creadors.tv/api/cerca/?text=tita&type[]=creadors
+• https://www.creadors.tv/api/cerca/?text=tita&type[]=videos
+• https://www.creadors.tv/api/cerca/?text=tita&type[]=creadors&type[]=videos
+• https://www.creadors.tv/api/cerca/?text=shen&type[]=creadors&type[]=videos&platform[]=twitch
+• https://www.creadors.tv/api/cerca/?text=tita&type[]=creadors&type[]=videos&categoria[]=2
+
+Observaciones:
+--------------
+• El endpoint puede devolver un array con creadores, vídeos o ambos dependiendo de "type".  
+• La estructura de los creadores o vídeos devueltos es similar a la descrita en los apartados anteriores.
+
+
+================================================================================
+7. OBSERVACIONES Y FUTURO
+================================================================================
+
+• Identificadores Internos:  
+  Se usa un ID numérico (p.ej. 1, 2…) para referenciar creadores.  
+• Cache:  
+  El servidor implementa una capa de cache (por ejemplo 1h para listados, 15 días en pruebas).  
+• Control de Acceso:  
+  En el futuro se añadirá un sistema de credenciales para evitar llamadas no deseadas.
+
+
+FIN DEL DOCUMENTO

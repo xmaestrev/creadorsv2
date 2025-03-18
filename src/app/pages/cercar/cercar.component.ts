@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 import { CreatorsService } from '../../services/creators.service';
 
 @Component({
@@ -13,26 +14,33 @@ import { CreatorsService } from '../../services/creators.service';
   styleUrls: ['./cercar.component.css']
 })
 export class CercarComponent implements OnInit {
-  // Paràmetres de cerca (query params)
+  // Query params
+  text: string = '';
   categoria: string = '';
+  // Valor por defecto para la búsqueda sin texto
+  type: string[] = ['creadors', 'videos'];
+  platform: string[] = [];
 
-  // Arrays complets de resultats
+  // Nuevo select para tipo de búsqueda: "all", "videos" o "creadors"
+  selectedSearchType: string = 'all';
+
+  // Resultados completos
   videos: any[] = [];
   creators: any[] = [];
 
-  // Arrays per a les dues seccions
+  // División en dos grupos
   firstFourVideos: any[] = [];
   restOfVideos: any[] = [];
   firstFourCreators: any[] = [];
   restOfCreators: any[] = [];
 
-  // Control per mostrar "Veure més"
+  // Control para "Ver más"
   displayedRestVideosCount: number = 8;
   displayedRestCreatorsCount: number = 8;
 
   isLoading: boolean = false;
 
-  // Filtres visuals (opcionals)
+  // Filtros visuales adicionales (opcionales)
   platformFilter: string = 'all';  // 'all', 'twitch', 'youtube'
   orderFilter: string = 'recent';  // 'recent', 'oldest'
   twitchTypeFilter: string = 'all';  // 'all', 'clip', 'emission'
@@ -44,76 +52,122 @@ export class CercarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Llegim el query param "categoria", p.e., /cercar?categoria=2
+    // Se leen los query params: text, categoria, type[] y selectedSearchType
     this.route.queryParams.subscribe(params => {
+      this.text = params['text'] || '';
       this.categoria = params['categoria'] || '';
-      if (this.categoria) {
-        this.loadResults();
-      } else {
-        // Si no hi ha categoria, es buida tot
-        this.videos = [];
-        this.creators = [];
-        this.firstFourVideos = [];
-        this.restOfVideos = [];
-        this.firstFourCreators = [];
-        this.restOfCreators = [];
-      }
+      this.selectedSearchType = params['selectedSearchType'] || 'all';
+      this.type = params['type[]']
+        ? (Array.isArray(params['type[]']) ? params['type[]'] : [params['type[]']])
+        : ['creadors', 'videos'];
+      this.platform = params['platform[]']
+        ? (Array.isArray(params['platform[]']) ? params['platform[]'] : [params['platform[]']])
+        : [];
+      this.loadResults();
     });
+  }
+
+  private getTypeFromSearchSelect(): string[] {
+    if (this.selectedSearchType === 'all') {
+      return ['videos', 'creadors'];
+    } else {
+      return [this.selectedSearchType];
+    }
   }
 
   loadResults(): void {
     this.isLoading = true;
-    forkJoin({
-      videos: this.creatorsService.getVideosByCategory(this.categoria, 'twitch'),
-      creators: this.creatorsService.search({
-        text: '',
-        type: ['creadors'],
-        categoria: [this.categoria]
-      })
-    }).subscribe({
-      next: (data: any) => {
-        // Processar vídeos
-        if (Array.isArray(data.videos)) {
-          // Si la resposta és directament un array
-          this.videos = data.videos.map((video: any) => this.mapVideo(video));
-        } else if (data.videos && Array.isArray(data.videos.videos)) {
-          // Si la resposta és un objecte amb propietat "videos"
-          this.videos = data.videos.videos.map((video: any) => this.mapVideo(video));
-        } else {
-          this.videos = [];
+    const query = {
+      text: this.text,
+      // Si hay texto, usamos el valor del select; si no, se filtra por categoría
+      type: this.text ? this.getTypeFromSearchSelect() : (this.categoria ? ['creadors', 'videos'] : this.type),
+      platform: this.platform,
+      // Si hay texto, ignoramos la categoría; si no, se aplica
+      categoria: this.text ? [] : (this.categoria ? [this.categoria] : [])
+    };
+
+    this.creatorsService.search(query).subscribe({
+      next: (data) => {
+        let resultsArray: any[] = [];
+        if (Array.isArray(data)) {
+          resultsArray = data;
+        } else if (data && Array.isArray(data.results)) {
+          resultsArray = data.results;
         }
-        console.log('Total vídeos:', this.videos.length);
-
-        // Separar els primers 4 i la resta per vídeos
-        this.firstFourVideos = this.videos.slice(0, 4);
-        this.restOfVideos = this.videos.slice(4);
-        this.displayedRestVideosCount = 8;
-
-        console.log("jdhsdkjghsd:" + this.firstFourVideos)
-
-        // Processar creadors
-        if (Array.isArray(data.creators)) {
-          this.creators = data.creators;
-        } else if (data.creators && Array.isArray(data.creators.results)) {
-          this.creators = data.creators.results;
+        if (this.text) {
+          // Con texto, filtramos: items con URL (o embed_url) son vídeos, el resto son creadores
+          this.videos = resultsArray.filter(item => {
+            const videoUrl = item.url || item.embed_url;
+            return videoUrl && (videoUrl.includes('twitch') || videoUrl.includes('youtube'));
+          });
+          this.creators = resultsArray.filter(item => !(item.url || item.embed_url));
         } else {
-          this.creators = [];
+          this.videos = resultsArray.filter(item => {
+            const videoUrl = item.url || item.embed_url;
+            return videoUrl && (videoUrl.includes('twitch') || videoUrl.includes('youtube'));
+          });
+          this.creators = resultsArray.filter(item => !(item.url || item.embed_url));
         }
-        console.log('Total creadors:', this.creators.length);
-
-        // Separar els primers 4 i la resta per creadors
-        this.firstFourCreators = this.creators.slice(0, 4);
-        this.restOfCreators = this.creators.slice(4);
-        this.displayedRestCreatorsCount = 8;
-
-        this.applyFilters();
-        this.isLoading = false;
+        // Si no hay texto y hay categoría, se hace una llamada extra para vídeos de Twitch
+        if (!this.text && this.categoria) {
+          this.creatorsService.getVideosByCategory(this.categoria, 'twitch').subscribe({
+            next: (vidData: any) => {
+              let additionalVideos: any[] = [];
+              if (Array.isArray(vidData)) {
+                additionalVideos = vidData.map((video: any) => this.mapVideo(video));
+              } else if (vidData && Array.isArray(vidData.videos)) {
+                additionalVideos = vidData.videos.map((video: any) => this.mapVideo(video));
+              }
+              if (additionalVideos.length > 0) {
+                this.videos = additionalVideos;
+              }
+              // Mapear IDs a nombres para vídeos
+              this.mapCreatorIdsToNames(this.videos).subscribe({
+                next: () => {
+                  this.separateResults();
+                  this.isLoading = false;
+                },
+                error: () => {
+                  this.separateResults();
+                  this.isLoading = false;
+                }
+              });
+            },
+            error: (err) => {
+              console.error('Error en getVideosByCategory:', err);
+              this.separateResults();
+              this.isLoading = false;
+            }
+          });
+        } else {
+          // Mapear nombres en vídeos (para que se actualice la propiedad creator)
+          this.mapCreatorIdsToNames(this.videos).subscribe({
+            next: () => {
+              this.separateResults();
+              this.isLoading = false;
+            },
+            error: () => {
+              this.separateResults();
+              this.isLoading = false;
+            }
+          });
+        }
       },
       error: (err) => {
-        console.error('Error al carregar resultats:', err);
+        console.error('Error en la cerca:', err);
         this.isLoading = false;
       }
     });
+  }
+
+  private separateResults(): void {
+    // Divide los vídeos y creadores en dos bloques: primeros 4 y resto
+    this.firstFourVideos = this.videos.slice(0, 4);
+    this.restOfVideos = this.videos.slice(4);
+    this.displayedRestVideosCount = 8;
+    this.firstFourCreators = this.creators.slice(0, 4);
+    this.restOfCreators = this.creators.slice(4);
+    this.displayedRestCreatorsCount = 8;
   }
 
   private mapVideo(video: any) {
@@ -122,20 +176,41 @@ export class CercarComponent implements OnInit {
       finalThumb = finalThumb.replace(/%\{width\}/g, '320').replace(/%\{height\}/g, '180');
     }
     return {
-      video_id: video.video_id,
-      url: video.url,
+      video_id: video.video_id || video.id,
+      url: video.url || video.embed_url,
       thumbnail_url: finalThumb,
       title: video.title || 'Sense títol',
       description: video.description || '',
-      creatorId: video.creatorId || '',
+      creatorId: video.creatorId || video.creator_id || '',
       duration: video.duration ? video.duration + 's' : '',
-      type: video.type ? video.type.toLowerCase() : '' // ex: "clip"
+      type: video.type ? video.type.toLowerCase() : ''
     };
   }
 
-  applyFilters(): void {
-    // Aquí pots afegir filtres addicionals si cal.
-    // Per ara, no realitzem filtres addicionals.
+  private mapCreatorIdsToNames(items: any[]): any {
+    const distinctIds = Array.from(new Set(items.map(i => i.creatorId).filter(x => x)));
+    if (distinctIds.length === 0) {
+      return of(null);
+    }
+    const calls = distinctIds.map(id => this.creatorsService.getCreatorById(id));
+    return forkJoin(calls).pipe(
+      mergeMap((creatorsData: any[]) => {
+        const nameMap: Record<string, string> = {};
+        creatorsData.forEach(c => {
+          if (c && c.creatorId) {
+            nameMap[c.creatorId] = c.name;
+          }
+        });
+        items.forEach(item => {
+          if (item.creatorId && nameMap[item.creatorId]) {
+            item.creator = nameMap[item.creatorId];
+          } else {
+            item.creator = 'Unknown';
+          }
+        });
+        return of(true);
+      })
+    );
   }
 
   loadMoreVideos(): void {
@@ -155,7 +230,15 @@ export class CercarComponent implements OnInit {
     }
   }
 
-  navigateToCreator(creator: any): void {
-    this.router.navigate(['/creador'], { queryParams: { id: creator.creatorId } });
+  navigateToCreator(creatorId: any): void {
+    if (creatorId) {
+      this.router.navigate(['/creador'], { queryParams: { id: creatorId } });
+    } else {
+      console.warn('El item no tiene creatorId definido.');
+    }
+  }
+
+  applyFilters(): void {
+    // Aquí puedes aplicar filtros adicionales si es necesario; de momento se deja vacío.
   }
 }

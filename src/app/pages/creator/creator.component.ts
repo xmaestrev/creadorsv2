@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
 import { CreatorsService, Creator } from '../../services/creators.service';
+import { CommonModule } from '@angular/common';
 import { SliderComponent } from '../../components/slider/slider.component';
 
 @Component({
@@ -17,8 +17,10 @@ export class CreatorComponent implements OnInit {
   creator: Creator | null = null;
   isLoading = true;
 
-  // Array donde guardamos un subset (hasta 4) de videos/clips
-  firstVideos: any[] = [];
+  // Arrays para cada slider
+  twitchClips: any[] = [];
+  twitchVideos: any[] = [];
+  youtubeVideos: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -27,7 +29,6 @@ export class CreatorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Obtenemos ?id=xxx de los query params
     this.route.queryParams.subscribe(params => {
       const id = params['id'];
       if (id) {
@@ -45,7 +46,7 @@ export class CreatorComponent implements OnInit {
       next: (data) => {
         console.log('Creador cargado:', data);
         this.creator = data;
-        this.processCreatorVideos(data);
+        this.processCreatorContent(data);
         this.isLoading = false;
       },
       error: (err) => {
@@ -56,68 +57,102 @@ export class CreatorComponent implements OnInit {
   }
 
   /**
-   * Recorre 'linkedchannels' y extrae clips o videos de Twitch/YouTube
+   * Procesa los contenidos de "linked_channels" y separa en:
+   * - twitchClips: clips de Twitch
+   * - twitchVideos: vídeos de Twitch
+   * - youtubeVideos: vídeos de YouTube (si existiesen)
    */
-  processCreatorVideos(creatorData: Creator) {
-    const allVideos: any[] = [];
+  processCreatorContent(creatorData: Creator) {
+    // Inicializamos los arrays
+    this.twitchClips = [];
+    this.twitchVideos = [];
+    this.youtubeVideos = [];
 
-    // 'linkedchannels' es un objeto cuyas keys son p.ej. 'twitch419181553', 'youtubeUCVBivcw5ZUV1tHqF7Xm0ZdA'
-    // Recorremos cada key:
+    // linked_channels puede ser un objeto; iteramos sobre sus keys.
     const channelsObj = (creatorData as any).linkedchannels || {};
-
-    for (const channelKey of Object.keys(channelsObj)) {
-      const channel = channelsObj[channelKey];
-      // Si es de tipo 'twitch' y tiene 'clips'
+    Object.keys(channelsObj).forEach(key => {
+      const channel = channelsObj[key];
       if (channel.type === 'twitch') {
+        // Procesamos clips
         if (channel.clips && Array.isArray(channel.clips)) {
-          // Mapear cada clip a una estructura uniforme
-          const mappedClips = channel.clips.map((clip: any) => ({
-            title: clip.title,
-            url: clip.url,
-            thumbnail: clip.thumbnail_url,
-            description: clip.creator_name || '', // o clip.description si existiera
-            duration: clip.duration ? clip.duration + 's' : '',
-          }));
-          allVideos.push(...mappedClips);
+          const mappedClips = channel.clips.map((clip: any) => {
+            let fixedThumbnail = clip.thumbnail_url;
+            if (fixedThumbnail && fixedThumbnail.includes('%{width}')) {
+              fixedThumbnail = fixedThumbnail.replace(/%\{width\}/g, '320').replace(/%\{height\}/g, '180');
+            }
+            return {
+              title: clip.title,
+              url: clip.url,
+              thumbnail: fixedThumbnail,
+              description: clip.creator_name || '',
+              duration: clip.duration ? clip.duration + 's' : '',
+              creator: this.creator ? this.creator.name : 'Unknown',
+              creatorId: this.creator ? this.creator.creatorId : ''
+            };
+          });
+          this.twitchClips.push(...mappedClips);
         }
-        // Si en el futuro hay channel.videos, también podríamos mapearlos
+        // Procesamos vídeos (si existen)
         if (channel.videos && Array.isArray(channel.videos)) {
-          const mappedVideos = channel.videos.map((vid: any) => ({
+          const mappedVideos = channel.videos.map((vid: any) => {
+            let fixedThumbnail = vid.thumbnail_url;
+            if (fixedThumbnail && fixedThumbnail.includes('%{width}')) {
+              fixedThumbnail = fixedThumbnail.replace(/%\{width\}/g, '320').replace(/%\{height\}/g, '180');
+            }
+            return {
+              title: vid.title,
+              url: vid.url,
+              thumbnail: fixedThumbnail,
+              description: vid.description || '',
+              duration: vid.duration ? vid.duration + 's' : '',
+              creator: this.creator ? this.creator.name : 'Unknown',
+              creatorId: this.creator ? this.creator.creatorId : ''
+            };
+          });
+          this.twitchVideos.push(...mappedVideos);
+        }
+      } else if (channel.type === 'youtube') {
+        // Procesamos vídeos de YouTube (si se implementa)
+        if (channel.videos && Array.isArray(channel.videos)) {
+          const mappedYT = channel.videos.map((vid: any) => ({
             title: vid.title,
-            url: vid.url,
+            url: `https://www.youtube.com/watch?v=${vid.video_id}`,
             thumbnail: vid.thumbnail_url,
             description: vid.description || '',
             duration: vid.duration ? vid.duration + 's' : '',
+            creator: this.creator ? this.creator.name : 'Unknown',
+            creatorId: this.creator ? this.creator.creatorId : ''
           }));
-          allVideos.push(...mappedVideos);
+          this.youtubeVideos.push(...mappedYT);
         }
       }
-      // Si es de tipo 'youtube' y en el futuro tuviera 'videos', lo procesaríamos igual
-      if (channel.type === 'youtube') {
-        // Por ahora, no hay array de videos. Si en el futuro se implementa, se haría algo parecido:
-        // if (channel.videos && Array.isArray(channel.videos)) { ... }
-      }
-    }
-
-    // Guardar solo los primeros 4 en 'firstVideos'
-    this.firstVideos = allVideos.slice(0, 4);
+    });
   }
 
   /**
-   * Abre el video/clip en una nueva pestaña (por ahora).
+   * Abre el contenido (clip o vídeo) en nueva pestaña.
    */
-  goToVideo(video: any): void {
-    if (video.url) {
-      window.open(video.url, '_blank', 'noopener,noreferrer');
+  goToContent(item: any): void {
+    if (item.url) {
+      window.open(item.url, '_blank', 'noopener,noreferrer');
     } else {
-      console.warn('El video no tiene URL');
+      console.warn('El contenido no tiene URL');
     }
   }
 
   /**
-   * Placeholder para "Ver todos"
+   * Navega a la página del creador.
    */
-  viewAllVideos(): void {
-    alert('Funcionalidad "Ver todos" pendiente de implementar...');
+  navigateToCreator(): void {
+    if (this.creator && this.creator.creatorId) {
+      this.router.navigate(['/creador'], { queryParams: { id: this.creator.creatorId } });
+    }
+  }
+
+  /**
+   * Funcionalidad pendiente para "Ver todos" de cada slider.
+   */
+  viewAllContent(type: string): void {
+    alert(`Funcionalidad "Ver todos" para ${type} pendiente de implementar...`);
   }
 }

@@ -3,7 +3,7 @@
     <!-- LOGO / BRAND -->
     <a class="navbar-brand text-white" routerLink="/">Creadors.TV</a>
 
-    <!-- Botón hamburguesa para colapsar en pantallas pequeñas -->
+    <!-- Botón hamburguesa -->
     <button
       class="navbar-toggler text-white"
       type="button"
@@ -18,7 +18,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Menú de la izquierda -->
+      <!-- Menú esquerra -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/qui-som/">Qui som?</a>
@@ -28,29 +28,29 @@
         </li>
       </ul>
 
-      <!-- Menú dret: select de categories i buscador -->
+      <!-- Formulari de cerca integrat -->
       <form class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
+        <!-- Select de categories -->
         <div>
-          <!-- Select amb ngModel per mostrar la categoria actual -->
           <select class="form-select me-2" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)" name="categoria">
-            <option value="" selected>Totes les categories</option>
+            <option value="">Totes les categories</option>
             <option *ngFor="let category of categories" [value]="category.categoryId">
               {{ category.title }}
             </option>
           </select>
         </div>
-        <div>
-          <input
-            type="text"
-            [(ngModel)]="searchText"
-            name="searchText"
-            placeholder="Cercar..."
-            class="form-control"
-          >
-        </div>
-        <div>
+        <!-- Grup d'inputs per cercar -->
+        <div class="d-flex gap-2">
+          <input type="text" [(ngModel)]="searchText" name="searchText" placeholder="Cercar..." class="form-control">
+          <!-- Select per tipus de cerca -->
+          <select class="form-select" [(ngModel)]="selectedSearchType" name="selectedSearchType">
+            <option value="all">Tots</option>
+            <option value="videos">Vídeos</option>
+            <option value="creadors">Creadors</option>
+          </select>
           <button type="button" (click)="goToCercar()" class="btn btn-primary">Cercar</button>
         </div>
+        
       </form>
     </div>
   </div>

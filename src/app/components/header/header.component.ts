@@ -1,19 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { CreatorsService } from '../../services/creators.service';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CreatorsService } from '../../services/creators.service';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, RouterModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css',
+  styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
   categories: any[] = [];
   selectedCategory: string = '';
+
+  // Camps del formulari de cerca
   searchText: string = '';
+  // Nou select per tipus de cerca: "all", "videos" o "creadors"
+  selectedSearchType: string = 'all';
 
   constructor(
     private creatorsService: CreatorsService,
@@ -23,35 +28,54 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
-    // Actualizamos el select amb el valor del query param "categoria"
+    // Actualitza el select amb el valor del query param "categoria" si existeix
     this.route.queryParams.subscribe(params => {
-      this.selectedCategory = params['categoria'] || '';
+      if (params['categoria']) {
+        this.selectedCategory = params['categoria'];
+      }
     });
   }
 
-  loadCategories(forceRefresh = false): void {
+  loadCategories(forceRefresh: boolean = false): void {
     this.creatorsService.getCategories(forceRefresh).subscribe({
       next: (cats) => {
         this.categories = cats;
-        console.log('Categorías cargadas:', this.categories);
       },
       error: (err) => {
         console.error('Error al cargar categorías', err);
-      },
+      }
     });
   }
 
   onCategoryChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    const selectedCategory = target.value;
-    if (!selectedCategory) {
-      this.router.navigate(['/cercar']);
+    const selected = target.value;
+    this.selectedCategory = selected;
+    if (selected) {
+      this.router.navigate(['/cercar'], { queryParams: { categoria: selected } });
     } else {
-      this.router.navigate(['/cercar'], { queryParams: { categoria: selectedCategory } });
+      this.router.navigate(['/cercar']);
     }
   }
 
   goToCercar(): void {
-    this.router.navigate(['/cercar'], { queryParams: { text: this.searchText } });
+    let type: string[];
+    if (this.selectedSearchType === 'all') {
+      type = ['videos', 'creadors'];
+    } else {
+      type = [this.selectedSearchType];  // per exemple, ['videos'] si s'ha triat "videos"
+    }
+    const queryParams: any = {
+      text: this.searchText,
+      'type[]': type,
+      selectedSearchType: this.selectedSearchType // incloure aquest paràmetre
+    };
+    if (this.selectedCategory) {
+      queryParams.categoria = this.selectedCategory;
+    }
+    console.log('Query params:', queryParams);
+    this.router.navigate(['/cercar'], { queryParams });
   }
+  
+  
 }

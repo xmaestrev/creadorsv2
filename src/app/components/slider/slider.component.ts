@@ -52,5 +52,13 @@ export class SliderComponent {
       window.open(videoUrl, '_blank', 'noopener,noreferrer');
     }
   }
+
+  navigateToCreator(creatorId: any): void {
+    if (creatorId) {
+      this.router.navigate(['/creador'], { queryParams: { id: creatorId } });
+    } else {
+      console.warn('El item no tiene creatorId definido.');
+    }
+  }
   
 }

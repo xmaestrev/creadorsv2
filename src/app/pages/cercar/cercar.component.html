@@ -3,7 +3,7 @@
 
   <!-- Skeleton Loader -->
   <div class="row" *ngIf="isLoading">
-    <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="col-md-3 mb-3">
+    <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">
       <div class="skeleton-card">
         <div class="skeleton-img"></div>
         <div class="skeleton-title"></div>
@@ -12,159 +12,93 @@
     </div>
   </div>
 
-  <!-- Secció de VÍDEOS -->
+  <!-- Sección de VÍDEOS -->
   <h3 class="mb-3" *ngIf="!isLoading && videos.length > 0">Vídeos</h3>
 
-  <!-- Primer bloc: primers 4 vídeos -->
+  <!-- Primer bloque: primeros 4 vídeos -->
   <div class="row" *ngIf="!isLoading && firstFourVideos.length > 0">
     <div *ngFor="let video of firstFourVideos" class="col-md-3 mb-3">
-      <div
-        class="card position-relative"
-        (click)="navigateToVideo(video)"
-        style="cursor: pointer"
-      >
+      <div class="card position-relative" (click)="navigateToVideo(video)" style="cursor: pointer;">
         <div class="position-relative">
-          <img
-            [src]="video.thumbnail_url"
-            class="card-img-top"
-            alt="Video thumbnail"
-          />
-          <span
-            *ngIf="video.duration"
-            class="badge bg-dark position-absolute bottom-0 end-0 m-2"
-          >
+          <img [src]="video.thumbnail_url" class="card-img-top" alt="Video thumbnail">
+          <span *ngIf="video.duration" class="badge bg-dark position-absolute bottom-0 end-0 m-2">
             {{ video.duration }}
           </span>
         </div>
         <div class="card-body">
           <h5 class="card-title">{{ video.title }}</h5>
-          <p class="text-muted mb-1 creator-name">{{ video.creatorId }}</p>
+          <!-- Mostrar el nombre del creador en lugar de la ID -->
+          <p (click)="navigateToCreator(video.creatorId)" class="text-muted mb-1 creator-name">{{ video.creator }}</p>
           <p class="card-text">{{ video.description }}</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Secció de CREADORS -->
-  <h3 class="mb-3 mt-5" *ngIf="!isLoading && creators.length > 0">Creadors</h3>
+  <!-- Segundo bloque: resto de vídeos -->
+  <div class="row" *ngIf="!isLoading && restOfVideos.length > 0">
+    <div *ngFor="let video of restOfVideos | slice:0:displayedRestVideosCount" class="col-md-3 mb-3">
+      <div class="card position-relative" (click)="navigateToVideo(video)" style="cursor: pointer;">
+        <div class="position-relative">
+          <img [src]="video.thumbnail_url" class="card-img-top" alt="Video thumbnail">
+          <span *ngIf="video.duration" class="badge bg-dark position-absolute bottom-0 end-0 m-2">
+            {{ video.duration }}
+          </span>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ video.title }}</h5>
+          <p (click)="navigateToCreator(video.creatorId)" class="text-muted mb-1 creator-name">{{ video.creator }}</p>
+          <p class="card-text">{{ video.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- Primer bloc: primers 4 creadors -->
+  <!-- Botón "Veure més" para vídeos -->
+  <div class="text-center" *ngIf="!isLoading && restOfVideos.length > displayedRestVideosCount">
+    <button class="btn btn-link" (click)="loadMoreVideos()">Veure més vídeos</button>
+  </div>
+
+  <!-- Mensaje si no hay vídeos -->
+  <div *ngIf="!isLoading && videos.length === 0" class="no-videos-message text-center">
+    <p>No hay vídeos per aquesta categoría</p>
+  </div>
+
+  <!-- Sección de CREADORS -->
+  <h3 class="mb-3 mt-5" *ngIf="!isLoading && creators.length > 0">Creadors</h3>
+  <!-- Primer bloque: primeros 4 creadors -->
   <div class="row" *ngIf="!isLoading && firstFourCreators.length > 0">
     <div *ngFor="let creator of firstFourCreators" class="col-md-3 mb-3">
-      <div
-        class="creator-card text-center"
-        (click)="navigateToCreator(creator)"
-        style="cursor: pointer"
-      >
-        <img
-          [src]="creator.imageUrl || 'assets/img/default-creator-profile.png'"
-          alt="Creador"
-          class="creator-image mb-2"
-        />
+      <div class="creator-card text-center" (click)="navigateToCreator(creator)" style="cursor: pointer;">
+        <img [src]="creator.imageUrl || 'assets/img/default-creator-profile.png'" alt="Creador" class="creator-image mb-2">
         <h5 class="creator-name">{{ creator.name }}</h5>
       </div>
     </div>
   </div>
 
-  <!-- Secció de CREADORS -->
-  <h3 class="mb-3 mt-5" *ngIf="!isLoading && videos.length > 0">Tots els vídeos</h3>
-
-  <!-- Segon bloc: resta de vídeos (fins a un màxim de 8 mostrats inicialment) -->
-  <div class="row" *ngIf="!isLoading && restOfVideos.length > 0">
-    <div
-      *ngFor="let video of restOfVideos | slice : 0 : displayedRestVideosCount"
-      class="col-md-3 mb-3"
-    >
-      <div
-        class="card position-relative"
-        (click)="navigateToVideo(video)"
-        style="cursor: pointer"
-      >
-        <div class="position-relative">
-          <img
-            [src]="video.thumbnail_url"
-            class="card-img-top"
-            alt="Video thumbnail"
-          />
-          <span
-            *ngIf="video.duration"
-            class="badge bg-dark position-absolute bottom-0 end-0 m-2"
-          >
-            {{ video.duration }}
-          </span>
-        </div>
-        <div class="card-body">
-          <h5 class="card-title">{{ video.title }}</h5>
-          <p class="text-muted mb-1 creator-name">{{ video.creatorId }}</p>
-          <p class="card-text">{{ video.description }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Botó "Veure més" per vídeos si n'hi ha més -->
-  <div
-    class="text-center"
-    *ngIf="!isLoading && restOfVideos.length > displayedRestVideosCount"
-  >
-    <button class="btn btn-link" (click)="loadMoreVideos()">
-      Veure més vídeos
-    </button>
-  </div>
-
-  <!-- Missatge si no hi ha vídeos -->
-  <div
-    *ngIf="!isLoading && videos.length === 0"
-    class="no-videos-message text-center"
-  >
-    <p>No hi ha vídeos per aquesta categoria</p>
-  </div>
-
-  <h3 class="mb-3" *ngIf="!isLoading && creators.length > 0">Tots els creadors</h3>
-  <!-- Segon bloc: resta de creadors (fins a un màxim de 8 mostrats inicialment) -->
+  <!-- Segundo bloque: resto de creadors -->
   <div class="row" *ngIf="!isLoading && restOfCreators.length > 0">
-    <div
-      *ngFor="
-        let creator of restOfCreators | slice : 0 : displayedRestCreatorsCount
-      "
-      class="col-md-3 mb-3"
-    >
-      <div
-        class="creator-card text-center"
-        (click)="navigateToCreator(creator)"
-        style="cursor: pointer"
-      >
-        <img
-          [src]="creator.imageUrl || 'assets/img/default-creator-profile.png'"
-          alt="Creador"
-          class="creator-image mb-2"
-        />
+    <div *ngFor="let creator of restOfCreators | slice:0:displayedRestCreatorsCount" class="col-md-3 mb-3">
+      <div class="creator-card text-center" (click)="navigateToCreator(creator)" style="cursor: pointer;">
+        <img [src]="creator.imageUrl || 'assets/img/default-creator-profile.png'" alt="Creador" class="creator-image mb-2">
         <h5 class="creator-name">{{ creator.name }}</h5>
       </div>
     </div>
   </div>
 
-  <!-- Botó "Veure més" per creadors si n'hi ha més -->
-  <div
-    class="text-center"
-    *ngIf="!isLoading && restOfCreators.length > displayedRestCreatorsCount"
-  >
-    <button class="btn btn-link" (click)="loadMoreCreators()">
-      Veure més creadors
-    </button>
+  <!-- Botón "Veure més" para creadors -->
+  <div class="text-center" *ngIf="!isLoading && restOfCreators.length > displayedRestCreatorsCount">
+    <button class="btn btn-link" (click)="loadMoreCreators()">Veure més creadors</button>
   </div>
 
-  <!-- Missatge si no hi ha creadors -->
-  <div
-    *ngIf="!isLoading && creators.length === 0"
-    class="no-creators-message text-center"
-  >
-    <p>No hi ha creadors per aquesta categoria</p>
+  <!-- Mensaje si no hay creadors -->
+  <div *ngIf="!isLoading && creators.length === 0" class="no-creators-message text-center">
+    <p>No hi ha creadors per aquesta categoría</p>
   </div>
 
   <!-- Skeleton Loader -->
   <div class="row" *ngIf="isLoading">
-    <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="col-md-3 mb-3">
+    <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">
       <div class="skeleton-card">
         <div class="skeleton-img"></div>
         <div class="skeleton-title"></div>

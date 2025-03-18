@@ -1,24 +1,24 @@
 <div class="custom-container mt-4">
-  
-  <!-- 🔴 Canales en Directo -->
-  <h2 class="mb-3">📡 En Directe</h2>
+
+  <!-- Slider Twitch Directos o fallback -->
   <app-slider
-    *ngIf="!isLoading; else skeletonLoader"
-    [title]="'Canales en Directo'"
+    *ngIf="!isLoadingLive; else skeletonLoader"
+    [title]="sliderTitle"
     [items]="liveChannels"
     [numVisible]="4"
     [numScroll]="1"
-  ></app-slider>
+  >
+  </app-slider>
 
-  <!-- ⭐️ Videos Destacados (Últimos de YouTube) -->
-  <h2 class="mb-3">⭐️ Vídeos Destacats</h2>
+  <!-- Slider Videos Destacados (YouTube) -->
   <app-slider
-    *ngIf="!isLoading; else skeletonLoader"
-    [title]="'Destacats'"
+    *ngIf="!isLoadingFeatured; else skeletonLoader"
+    [title]="'⭐️ Vídeos Destacats'"
     [items]="featuredVideos"
     [numVisible]="4"
     [numScroll]="1"
-  ></app-slider>
+  >
+  </app-slider>
 
   <!-- Skeleton Loader -->
   <ng-template #skeletonLoader>
@@ -32,5 +32,4 @@
       </div>
     </div>
   </ng-template>
-
 </div>
