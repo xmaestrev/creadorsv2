@@ -66,16 +66,11 @@ export class CercarComponent implements OnInit {
     this.isLoading = true;
     const query = {
       text: this.text,
-      type: this.text
-              ? this.getTypeFromSearchSelect()
-              : (this.categoria && this.categoria !== 'todas'
-                  ? ['creadors', 'videos']
-                  : this.type),
+      type: this.text ? this.getTypeFromSearchSelect() : (this.categoria && this.categoria !== 'todas' ? ['creadors', 'videos'] : this.type),
       platform: this.platform,
       categoria: this.text ? [] : ((this.categoria && this.categoria !== 'todas') ? [this.categoria] : [])
     };
   
-    // Si no hay texto y el filtro es "all", se realizan dos llamadas separadas para vídeos y creadores
     if (!this.text && this.selectedSearchType === 'all') {
       const videosQuery = { ...query, type: ['videos'] };
       const creatorsQuery = { ...query, type: ['creadors'] };
@@ -126,7 +121,6 @@ export class CercarComponent implements OnInit {
         }
       });
     } else {
-      // Caso combinado (con texto o filtro específico)
       this.creatorsService.search(query).subscribe({
         next: (data) => {
           let resultsArray: any[] = [];
@@ -135,15 +129,20 @@ export class CercarComponent implements OnInit {
           } else if (data && Array.isArray(data.results)) {
             resultsArray = data.results;
           }
-          // Separar vídeos y creadores según presencia de URL o embed_url
-          this.videos = resultsArray.filter(item => {
-            const videoUrl = item.url || item.embed_url;
-            return videoUrl && (videoUrl.includes('twitch') || videoUrl.includes('youtube'));
-          });
-          this.creators = resultsArray.filter(item => !(item.url || item.embed_url));
-          
-          // Si no hay texto y se filtró por categoría (distinta de "todas"), se llama adicionalmente a getVideosByCategory
-          if (!this.text && this.categoria && this.categoria !== 'todas') {
+          if (this.text) {
+            this.videos = resultsArray.filter(item => {
+              const videoUrl = item.url || item.embed_url;
+              return videoUrl && (videoUrl.includes('twitch') || videoUrl.includes('youtube'));
+            });
+            this.creators = resultsArray.filter(item => !(item.url || item.embed_url));
+          } else {
+            this.videos = resultsArray.filter(item => {
+              const videoUrl = item.url || item.embed_url;
+              return videoUrl && (videoUrl.includes('twitch') || videoUrl.includes('youtube'));
+            });
+            this.creators = resultsArray.filter(item => !(item.url || item.embed_url));
+          }
+          if (!this.text && this.categoria) {
             this.creatorsService.getVideosByCategory(this.categoria, 'twitch').subscribe({
               next: (vidData: any) => {
                 let additionalVideos: any[] = [];
@@ -249,21 +248,26 @@ export class CercarComponent implements OnInit {
     const calls = distinctIds.map(id => this.creatorsService.getCreatorById(id));
     return forkJoin(calls).pipe(
       mergeMap((creatorsData: any[]) => {
-        const nameMap: Record<string, string> = {};
+        const infoMap: Record<string, { name: string, imageUrl: string }> = {};
         creatorsData.forEach(c => {
           if (c && c.creatorId) {
-            nameMap[c.creatorId] = c.name;
+            infoMap[c.creatorId] = { name: c.name, imageUrl: c.imageUrl };
           }
         });
         items.forEach(item => {
-          item.creator = item.creatorId && nameMap[item.creatorId] ? nameMap[item.creatorId] : 'Unknown';
+          if (item.creatorId && infoMap[item.creatorId]) {
+            item.creator = infoMap[item.creatorId].name;
+            item.creatorImage = infoMap[item.creatorId].imageUrl;
+          } else {
+            item.creator = 'Unknown';
+            item.creatorImage = 'assets/img/default-creator-profile.png';
+          }
         });
         return of(true);
       })
     );
   }
   
-  // Si se ha seleccionado un tipo específico, descartamos el otro conjunto
   private applyTypeFilter(): void {
     if (this.selectedSearchType === 'videos') {
       this.creators = [];
@@ -294,6 +298,6 @@ export class CercarComponent implements OnInit {
   }
   
   applyFilters(): void {
-    // Aquí se pueden aplicar filtros adicionales si es necesario.
+    // Se pueden aplicar filtros adicionales si es necesario.
   }
 }

@@ -1,6 +1,6 @@
 <div class="custom-container mt-4">
   <h2 class="category-header mb-5">Resultats de la cerca</h2>
-  {{selectedSearchType}}
+  
   <!-- Skeleton Loader -->
   <div class="row" *ngIf="isLoading">
     <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">
@@ -12,7 +12,7 @@
     </div>
   </div>
   
-  <!-- Sección de VÍDEOS (se muestra si el filtro es "all" o "videos") -->
+  <!-- Sección de VÍDEOS (mostrada si se selecciona "all" o "videos") -->
   <h3 class="mb-3" *ngIf="!isLoading && videos.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'videos')">Vídeos</h3>
   
   <!-- Primer bloque: primeros 4 vídeos -->
@@ -27,7 +27,11 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">{{ video.title }}</h5>
-          <p class="text-muted mb-1 creator-name">{{ video.creator }}</p>
+          <!-- Sección para mostrar la imagen de perfil y nombre del creador -->
+          <div class="creator-info d-flex align-items-center">
+            <img [src]="video.creatorImage || 'assets/img/default-creator-profile.png'" alt="Perfil del creador" class="creator-profile" style="width:30px; height:30px; border-radius:50%;">
+            <span class="ms-2 text-muted creator-name">{{ video.creator }}</span>
+          </div>
           <p class="card-text">{{ video.description }}</p>
         </div>
       </div>
@@ -46,7 +50,10 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">{{ video.title }}</h5>
-          <p class="text-muted mb-1 creator-name">{{ video.creator }}</p>
+          <div class="creator-info d-flex align-items-center">
+            <img [src]="video.creatorImage || 'assets/img/default-creator-profile.png'" alt="Perfil del creador" class="creator-profile" style="width:30px; height:30px; border-radius:50%;">
+            <span class="ms-2 text-muted creator-name">{{ video.creator }}</span>
+          </div>
           <p class="card-text">{{ video.description }}</p>
         </div>
       </div>
@@ -63,7 +70,7 @@
     <p>No hay vídeos per aquesta categoría</p>
   </div>
   
-  <!-- Sección de CREADORS (se muestra si el filtro es "all" o "creadors") -->
+  <!-- Sección de CREADORS (mostrada si se selecciona "all" o "creadors") -->
   <h3 class="mb-3 mt-5" *ngIf="!isLoading && creators.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'creadors')">Creadors</h3>
   
   <!-- Primer bloque: primeros 4 creadors -->

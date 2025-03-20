@@ -25,6 +25,7 @@ export interface Creator {
 export interface Video {
   video_id: string;
   creatorId?: string;
+  imageUrl?: string;
   title?: string;
   description?: string;
   url?: string;
