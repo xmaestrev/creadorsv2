@@ -1,6 +1,6 @@
 <div class="custom-container mt-4">
   <h2 class="category-header mb-5">Resultats de la cerca</h2>
-
+  {{selectedSearchType}}
   <!-- Skeleton Loader -->
   <div class="row" *ngIf="isLoading">
     <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">
@@ -11,12 +11,12 @@
       </div>
     </div>
   </div>
-
-  <!-- Sección de VÍDEOS -->
-  <h3 class="mb-3" *ngIf="!isLoading && videos.length > 0">Vídeos</h3>
-
+  
+  <!-- Sección de VÍDEOS (se muestra si el filtro es "all" o "videos") -->
+  <h3 class="mb-3" *ngIf="!isLoading && videos.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'videos')">Vídeos</h3>
+  
   <!-- Primer bloque: primeros 4 vídeos -->
-  <div class="row" *ngIf="!isLoading && firstFourVideos.length > 0">
+  <div class="row" *ngIf="!isLoading && firstFourVideos.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'videos')">
     <div *ngFor="let video of firstFourVideos" class="col-md-3 mb-3">
       <div class="card position-relative" (click)="navigateToVideo(video)" style="cursor: pointer;">
         <div class="position-relative">
@@ -27,16 +27,15 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">{{ video.title }}</h5>
-          <!-- Mostrar el nombre del creador en lugar de la ID -->
-          <p (click)="navigateToCreator(video.creatorId)" class="text-muted mb-1 creator-name">{{ video.creator }}</p>
+          <p class="text-muted mb-1 creator-name">{{ video.creator }}</p>
           <p class="card-text">{{ video.description }}</p>
         </div>
       </div>
     </div>
   </div>
-
+  
   <!-- Segundo bloque: resto de vídeos -->
-  <div class="row" *ngIf="!isLoading && restOfVideos.length > 0">
+  <div class="row" *ngIf="!isLoading && restOfVideos.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'videos')">
     <div *ngFor="let video of restOfVideos | slice:0:displayedRestVideosCount" class="col-md-3 mb-3">
       <div class="card position-relative" (click)="navigateToVideo(video)" style="cursor: pointer;">
         <div class="position-relative">
@@ -47,27 +46,28 @@
         </div>
         <div class="card-body">
           <h5 class="card-title">{{ video.title }}</h5>
-          <p (click)="navigateToCreator(video.creatorId)" class="text-muted mb-1 creator-name">{{ video.creator }}</p>
+          <p class="text-muted mb-1 creator-name">{{ video.creator }}</p>
           <p class="card-text">{{ video.description }}</p>
         </div>
       </div>
     </div>
   </div>
-
+  
   <!-- Botón "Veure més" para vídeos -->
-  <div class="text-center" *ngIf="!isLoading && restOfVideos.length > displayedRestVideosCount">
+  <div class="text-center" *ngIf="!isLoading && restOfVideos.length > displayedRestVideosCount && (selectedSearchType === 'all' || selectedSearchType === 'videos')">
     <button class="btn btn-link" (click)="loadMoreVideos()">Veure més vídeos</button>
   </div>
-
+  
   <!-- Mensaje si no hay vídeos -->
-  <div *ngIf="!isLoading && videos.length === 0" class="no-videos-message text-center">
+  <div *ngIf="!isLoading && videos.length === 0 && (selectedSearchType === 'all' || selectedSearchType === 'videos')" class="no-videos-message text-center">
     <p>No hay vídeos per aquesta categoría</p>
   </div>
-
-  <!-- Sección de CREADORS -->
-  <h3 class="mb-3 mt-5" *ngIf="!isLoading && creators.length > 0">Creadors</h3>
+  
+  <!-- Sección de CREADORS (se muestra si el filtro es "all" o "creadors") -->
+  <h3 class="mb-3 mt-5" *ngIf="!isLoading && creators.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'creadors')">Creadors</h3>
+  
   <!-- Primer bloque: primeros 4 creadors -->
-  <div class="row" *ngIf="!isLoading && firstFourCreators.length > 0">
+  <div class="row" *ngIf="!isLoading && firstFourCreators.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'creadors')">
     <div *ngFor="let creator of firstFourCreators" class="col-md-3 mb-3">
       <div class="creator-card text-center" (click)="navigateToCreator(creator)" style="cursor: pointer;">
         <img [src]="creator.imageUrl || 'assets/img/default-creator-profile.png'" alt="Creador" class="creator-image mb-2">
@@ -75,9 +75,9 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Segundo bloque: resto de creadors -->
-  <div class="row" *ngIf="!isLoading && restOfCreators.length > 0">
+  <div class="row" *ngIf="!isLoading && restOfCreators.length > 0 && (selectedSearchType === 'all' || selectedSearchType === 'creadors')">
     <div *ngFor="let creator of restOfCreators | slice:0:displayedRestCreatorsCount" class="col-md-3 mb-3">
       <div class="creator-card text-center" (click)="navigateToCreator(creator)" style="cursor: pointer;">
         <img [src]="creator.imageUrl || 'assets/img/default-creator-profile.png'" alt="Creador" class="creator-image mb-2">
@@ -85,17 +85,17 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Botón "Veure més" para creadors -->
-  <div class="text-center" *ngIf="!isLoading && restOfCreators.length > displayedRestCreatorsCount">
+  <div class="text-center" *ngIf="!isLoading && restOfCreators.length > displayedRestCreatorsCount && (selectedSearchType === 'all' || selectedSearchType === 'creadors')">
     <button class="btn btn-link" (click)="loadMoreCreators()">Veure més creadors</button>
   </div>
-
+  
   <!-- Mensaje si no hay creadors -->
-  <div *ngIf="!isLoading && creators.length === 0" class="no-creators-message text-center">
+  <div *ngIf="!isLoading && creators.length === 0 && (selectedSearchType === 'all' || selectedSearchType === 'creadors')" class="no-creators-message text-center">
     <p>No hi ha creadors per aquesta categoría</p>
   </div>
-
+  
   <!-- Skeleton Loader -->
   <div class="row" *ngIf="isLoading">
     <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">

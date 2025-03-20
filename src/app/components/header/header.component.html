@@ -2,23 +2,14 @@
   <div class="container-fluid">
     <!-- LOGO / BRAND -->
     <a class="navbar-brand text-white" routerLink="/">Creadors.TV</a>
-
     <!-- Botón hamburguesa -->
-    <button
-      class="navbar-toggler text-white"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-      style="border-color: #ffffff"
-    >
+    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation" style="border-color: #ffffff">
       <span class="navbar-toggler-icon" style="filter: invert(100%)"></span>
     </button>
-
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Menú esquerra -->
+      <!-- Menú izquierdo -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
           <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/qui-som/">Qui som?</a>
@@ -27,22 +18,22 @@
           <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/alta-socis/">Fes-te'n soci/a</a>
         </li>
       </ul>
-
-      <!-- Formulari de cerca integrat -->
+      <!-- Formulari de cerca integrado -->
       <form class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
-        <!-- Select de categories -->
+        <!-- Select de categorías -->
         <div>
           <select class="form-select me-2" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)" name="categoria">
-            <option value="">Totes les categories</option>
+            <option value="" selected>Selecciona una categoría</option>
+            <option value="todas">Todas las categorías</option>
             <option *ngFor="let category of categories" [value]="category.categoryId">
               {{ category.title }}
             </option>
           </select>
         </div>
-        <!-- Grup d'inputs per cercar -->
+        <!-- Grupo de inputs para la búsqueda -->
         <div class="d-flex gap-2">
           <input type="text" [(ngModel)]="searchText" name="searchText" placeholder="Cercar..." class="form-control">
-          <!-- Select per tipus de cerca -->
+          <!-- Select para tipo de búsqueda -->
           <select class="form-select" [(ngModel)]="selectedSearchType" name="selectedSearchType">
             <option value="all">Tots</option>
             <option value="videos">Vídeos</option>
@@ -50,7 +41,6 @@
           </select>
           <button type="button" (click)="goToCercar()" class="btn btn-primary">Cercar</button>
         </div>
-        
       </form>
     </div>
   </div>

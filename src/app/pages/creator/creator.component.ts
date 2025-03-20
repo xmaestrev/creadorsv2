@@ -34,6 +34,7 @@ export class CreatorComponent implements OnInit {
       if (id) {
         this.creatorId = id;
         this.loadCreatorInfo();
+        console.log('ID del creador:', this.creatorId);
       } else {
         console.error('No se recibió el ID del creador por query param');
       }
@@ -44,8 +45,8 @@ export class CreatorComponent implements OnInit {
     this.isLoading = true;
     this.creatorsService.getCreatorById(this.creatorId).subscribe({
       next: (data) => {
-        console.log('Creador cargado:', data);
         this.creator = data;
+        console.log('Creador cargado:', this.creator);
         this.processCreatorContent(data);
         this.isLoading = false;
       },

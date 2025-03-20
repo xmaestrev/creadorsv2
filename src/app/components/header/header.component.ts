@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { CreatorsService } from '../../services/creators.service';
+import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -14,10 +14,7 @@ import { CreatorsService } from '../../services/creators.service';
 export class HeaderComponent implements OnInit {
   categories: any[] = [];
   selectedCategory: string = '';
-
-  // Camps del formulari de cerca
   searchText: string = '';
-  // Nou select per tipus de cerca: "all", "videos" o "creadors"
   selectedSearchType: string = 'all';
 
   constructor(
@@ -28,7 +25,6 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
-    // Actualitza el select amb el valor del query param "categoria" si existeix
     this.route.queryParams.subscribe(params => {
       if (params['categoria']) {
         this.selectedCategory = params['categoria'];
@@ -40,6 +36,7 @@ export class HeaderComponent implements OnInit {
     this.creatorsService.getCategories(forceRefresh).subscribe({
       next: (cats) => {
         this.categories = cats;
+        console.log('Categorías cargadas:', this.categories);
       },
       error: (err) => {
         console.error('Error al cargar categorías', err);
@@ -51,31 +48,36 @@ export class HeaderComponent implements OnInit {
     const target = event.target as HTMLSelectElement;
     const selected = target.value;
     this.selectedCategory = selected;
-    if (selected) {
-      this.router.navigate(['/cercar'], { queryParams: { categoria: selected } });
+    // Si el valor es vacío (opción "Selecciona una categoría"), redirige a la home.
+    if (selected === '') {
+      this.router.navigate(['/']);
+      this.searchText = '';
+      this.selectedSearchType = 'all';
     } else {
-      this.router.navigate(['/cercar']);
+      // Si se selecciona "Todas las categorías" u otra categoría, se navega a /cercar
+      this.router.navigate(['/cercar'], { queryParams: { categoria: selected } });
     }
   }
+  
 
   goToCercar(): void {
+    // Determinamos el valor del parámetro type[] según el select
     let type: string[];
     if (this.selectedSearchType === 'all') {
       type = ['videos', 'creadors'];
     } else {
-      type = [this.selectedSearchType];  // per exemple, ['videos'] si s'ha triat "videos"
+      type = [this.selectedSearchType];
     }
-    const queryParams: any = {
+    // Construimos los query params, incluyendo el valor de selectedSearchType
+    const queryParams: any = { 
       text: this.searchText,
       'type[]': type,
-      selectedSearchType: this.selectedSearchType // incloure aquest paràmetre
+      selectedSearchType: this.selectedSearchType  // <-- Asegurarse de incluirlo
     };
     if (this.selectedCategory) {
       queryParams.categoria = this.selectedCategory;
     }
-    console.log('Query params:', queryParams);
     this.router.navigate(['/cercar'], { queryParams });
   }
-  
   
 }
