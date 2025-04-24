@@ -1,3 +1,77 @@
+/* creator.component.css */
+
+/* Contenedor de cada tarjeta esqueleto */
+.skeleton-card {
+  background: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Bloque de imagen */
+.skeleton-img {
+  background: #e0e0e0;
+  width: 100%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Líneas de texto */
+.skeleton-title {
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-text {
+  background: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Opcional: avatar circular */
+.skeleton-img.rounded-circle {
+  border-radius: 50%;
+}
+
+/* Animación de pulsación */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Ajustes de tamaño para el header skeleton */
+.creator-container .skeleton-img.rounded-circle {
+  display: inline-block;
+}
+
+.creator-container .skeleton-title {
+  height: 20px;
+  margin: 0.5rem auto;
+}
+
+.creator-container .skeleton-text {
+  height: 14px;
+  margin: 0.25rem auto;
+}
+
+/* Margen en secciones */
+.videos-section .skeleton-title {
+  height: 18px;
+  margin-bottom: 1rem;
+}
+
+.videos-section .skeleton-card {
+  padding: 0.5rem;
+}
+
+
 .creator-container {
     margin-left: 5em;
     margin-right: 5em;
