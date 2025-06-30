@@ -1,0 +1,62 @@
+<!-- src/app/reproductor-youtube/reproductor-youtube.component.html -->
+<div class="container mt-4" *ngIf="!isLoading && video; else loadingTpl">
+  <div class="row">
+    <!-- Player + descripción -->
+    <div class="col-md-8">
+      <div class="ratio ratio-16x9 mb-3">
+        <iframe
+          [src]="'https://www.youtube.com/embed/' + videoId | safeUrl"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <h4>{{ video.title }}</h4>
+      <p class="text-muted">{{ video.publishedAt | date }}</p>
+      <button class="btn btn-sm btn-link p-0 mb-2"
+              (click)="descriptionCollapsed = !descriptionCollapsed">
+        {{ descriptionCollapsed ? 'Mostrar descripción' : 'Ocultar descripción' }}
+      </button>
+      <p *ngIf="!descriptionCollapsed">{{ video.description }}</p>
+    </div>
+    <!-- Relacionados -->
+    <div class="col-md-4">
+      <h5>Relacionats</h5>
+      <div *ngFor="let rv of related"
+           class="d-flex mb-3"
+           (click)="goTo(rv)"
+           style="cursor: pointer">
+        <img [src]="rv.thumbnail"
+             class="me-2"
+             style="width:120px; height:90px; object-fit:cover;">
+        <div>
+          <small class="fw-bold">{{ rv.title }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="row">
+    <!-- Skeleton Player -->
+    <div class="col-md-8">
+      <div class="skeleton-img ratio ratio-16x9 mb-3"></div>
+      <div class="skeleton-title mb-2"></div>
+      <div class="skeleton-text mb-1"></div>
+      <div class="skeleton-text mb-3" style="width: 80%;"></div>
+      <div class="skeleton-button mb-4"></div>
+      <div class="skeleton-text mb-1"></div>
+      <div class="skeleton-text" style="width: 90%;"></div>
+    </div>
+    <!-- Skeleton Related -->
+    <div class="col-md-4">
+      <h5>Relacionats</h5>
+      <div *ngFor="let i of [1,2,3,4]" class="d-flex mb-3 align-items-center">
+        <div class="skeleton-thumb me-2" style="width:120px; height:90px;"></div>
+        <div class="flex-grow-1">
+          <div class="skeleton-text mb-1" style="width: 70%;"></div>
+          <div class="skeleton-text" style="width: 50%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

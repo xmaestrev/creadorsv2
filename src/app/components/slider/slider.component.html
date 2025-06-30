@@ -26,6 +26,7 @@
               [src]="item.thumbnail || 'https://idpeople.es/wp-content/themes/consultix/images/no-image-found-360x250.png'"
               class="card-img-top"
               alt="Video thumbnail"
+              (error)="onThumbnailError(item)"
             >
             <!-- Etiqueta 'EN DIRECTE' (solo si el video es en vivo) -->
             <span *ngIf="item.isLive" class="badge bg-danger position-absolute top-0 start-0 m-2">

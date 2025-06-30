@@ -34,7 +34,6 @@ export class CreatorComponent implements OnInit {
       if (id) {
         this.creatorId = id;
         this.loadCreatorInfo();
-        console.log('ID del creador:', this.creatorId);
       } else {
         console.error('No se recibió el ID del creador por query param');
       }
@@ -46,7 +45,6 @@ export class CreatorComponent implements OnInit {
     this.creatorsService.getCreatorById(this.creatorId).subscribe({
       next: (data) => {
         this.creator = data;
-        console.log('Creador cargado:', this.creator);
         this.processCreatorContent(data);
         this.isLoading = false;
       },
@@ -57,102 +55,88 @@ export class CreatorComponent implements OnInit {
     });
   }
 
-  /**
-   * Procesa los contenidos de "linked_channels" y separa en:
-   * - twitchClips: clips de Twitch
-   * - twitchVideos: vídeos de Twitch
-   * - youtubeVideos: vídeos de YouTube (si existiesen)
-   */
-  processCreatorContent(creatorData: Creator) {
-    // Inicializamos los arrays
+  private processCreatorContent(creatorData: Creator) {
+    // default profile pic
+    const profileImg = creatorData.imageUrl?.trim()
+      ? creatorData.imageUrl
+      : 'assets/img/default-creator-profile.png';
+
     this.twitchClips = [];
     this.twitchVideos = [];
     this.youtubeVideos = [];
 
-    // linked_channels puede ser un objeto; iteramos sobre sus keys.
     const channelsObj = (creatorData as any).linkedchannels || {};
-    Object.keys(channelsObj).forEach(key => {
-      const channel = channelsObj[key];
+    Object.values(channelsObj).forEach((channel: any) => {
       if (channel.type === 'twitch') {
-        // Procesamos clips
-        if (channel.clips && Array.isArray(channel.clips)) {
-          const mappedClips = channel.clips.map((clip: any) => {
-            let fixedThumbnail = clip.thumbnail_url;
-            if (fixedThumbnail && fixedThumbnail.includes('%{width}')) {
-              fixedThumbnail = fixedThumbnail.replace(/%\{width\}/g, '320').replace(/%\{height\}/g, '180');
+
+        // Clips
+        if (Array.isArray(channel.clips)) {
+          channel.clips.forEach((clip: any) => {
+            let thumb = clip.thumbnail_url;
+            if (thumb?.includes('%{width}')) {
+              thumb = thumb.replace(/%\{width\}/g,'320').replace(/%\{height\}/g,'180');
             }
-            return {
+            this.twitchClips.push({
               title: clip.title,
               url: clip.url,
-              thumbnail: fixedThumbnail,
+              thumbnail: thumb,
               description: clip.creator_name || '',
               duration: clip.duration ? clip.duration + 's' : '',
-              creator: this.creator ? this.creator.name : 'Unknown',
-              creatorId: this.creator ? this.creator.creatorId : ''
-            };
+              creator: creatorData.name,
+              creatorId: creatorData.creatorId,
+              creatorImage: profileImg
+            });
           });
-          this.twitchClips.push(...mappedClips);
         }
-        // Procesamos vídeos (si existen)
-        if (channel.videos && Array.isArray(channel.videos)) {
-          const mappedVideos = channel.videos.map((vid: any) => {
-            let fixedThumbnail = vid.thumbnail_url;
-            if (fixedThumbnail && fixedThumbnail.includes('%{width}')) {
-              fixedThumbnail = fixedThumbnail.replace(/%\{width\}/g, '320').replace(/%\{height\}/g, '180');
+
+        // Videos
+        if (Array.isArray(channel.videos)) {
+          channel.videos.forEach((vid: any) => {
+            let thumb = vid.thumbnail_url;
+            if (thumb?.includes('%{width}')) {
+              thumb = thumb.replace(/%\{width\}/g,'320').replace(/%\{height\}/g,'180');
             }
-            return {
+            this.twitchVideos.push({
               title: vid.title,
               url: vid.url,
-              thumbnail: fixedThumbnail,
+              thumbnail: thumb,
               description: vid.description || '',
               duration: vid.duration ? vid.duration + 's' : '',
-              creator: this.creator ? this.creator.name : 'Unknown',
-              creatorId: this.creator ? this.creator.creatorId : ''
-            };
+              creator: creatorData.name,
+              creatorId: creatorData.creatorId,
+              creatorImage: profileImg
+            });
           });
-          this.twitchVideos.push(...mappedVideos);
         }
+
       } else if (channel.type === 'youtube') {
-        // Procesamos vídeos de YouTube (si se implementa)
-        if (channel.videos && Array.isArray(channel.videos)) {
-          const mappedYT = channel.videos.map((vid: any) => ({
-            title: vid.title,
-            url: `https://www.youtube.com/watch?v=${vid.video_id}`,
-            thumbnail: vid.thumbnail_url,
-            description: vid.description || '',
-            duration: vid.duration ? vid.duration + 's' : '',
-            creator: this.creator ? this.creator.name : 'Unknown',
-            creatorId: this.creator ? this.creator.creatorId : ''
-          }));
-          this.youtubeVideos.push(...mappedYT);
+        // YouTube videos
+        if (Array.isArray(channel.videos)) {
+          channel.videos.forEach((vid: any) => {
+            this.youtubeVideos.push({
+              title: vid.title,
+              url: `https://www.youtube.com/watch?v=${vid.video_id}`,
+              thumbnail: vid.thumbnail_url,
+              description: vid.description || '',
+              duration: vid.duration ? vid.duration + 's' : '',
+              creator: creatorData.name,
+              creatorId: creatorData.creatorId,
+              creatorImage: profileImg
+            });
+          });
         }
       }
     });
   }
 
-  /**
-   * Abre el contenido (clip o vídeo) en nueva pestaña.
-   */
   goToContent(item: any): void {
-    if (item.url) {
-      window.open(item.url, '_blank', 'noopener,noreferrer');
-    } else {
-      console.warn('El contenido no tiene URL');
-    }
+    window.open(item.url, '_blank', 'noopener,noreferrer');
   }
 
-  /**
-   * Navega a la página del creador.
-   */
   navigateToCreator(): void {
-    if (this.creator && this.creator.creatorId) {
-      this.router.navigate(['/creador'], { queryParams: { id: this.creator.creatorId } });
-    }
+    this.router.navigate(['/creador'], { queryParams: { id: this.creator!.creatorId } });
   }
 
-  /**
-   * Funcionalidad pendiente para "Ver todos" de cada slider.
-   */
   viewAllContent(type: string): void {
     alert(`Funcionalidad "Ver todos" para ${type} pendiente de implementar...`);
   }

@@ -4,6 +4,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { CategoriaComponent } from './pages/categoria/categoria.component';
 import { CreatorComponent } from './pages/creator/creator.component';
 import { CercarComponent } from './pages/cercar/cercar.component';
+import { ReproductorYoutubeComponent } from './reproductor-youtube/reproductor-youtube.component';
 
 export const routes: Routes = [
   {
@@ -19,4 +20,5 @@ export const routes: Routes = [
   { path: 'cercar', 
     component: CercarComponent
   },
+  { path: 'video', component: ReproductorYoutubeComponent },
 ];

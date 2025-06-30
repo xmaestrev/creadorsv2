@@ -60,5 +60,9 @@ export class SliderComponent {
       console.warn('El item no tiene creatorId definido.');
     }
   }
+
+    onThumbnailError(item: any) {
+    this.items = this.items.filter(i => i !== item);
+  }
   
 }

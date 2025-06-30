@@ -1,27 +1,14 @@
 <div class="custom-container mt-4">
 
-  <!-- Slider Twitch Directos o fallback -->
+  <!-- ⭐️ Destacats Twitch -->
   <app-slider
-    *ngIf="!isLoadingLive; else skeletonLoader"
-    [title]="sliderTitle"
-    [items]="liveChannels"
+    *ngIf="!isLoadingFeaturedTwitch; else skTwitchF"
+    [title]="'⭐️ Destacats Twitch'"
+    [items]="featuredTwitch"
     [numVisible]="4"
     [numScroll]="1"
-  >
-  </app-slider>
-
-  <!-- Slider Videos Destacados (YouTube) -->
-  <app-slider
-    *ngIf="!isLoadingFeatured; else skeletonLoader"
-    [title]="'⭐️ Vídeos Destacats'"
-    [items]="featuredVideos"
-    [numVisible]="4"
-    [numScroll]="1"
-  >
-  </app-slider>
-
-  <!-- Skeleton Loader -->
-  <ng-template #skeletonLoader>
+  ></app-slider>
+  <ng-template #skTwitchF>
     <div class="row">
       <div *ngFor="let i of [1,2,3,4]" class="col-md-3 mb-3">
         <div class="skeleton-card">
@@ -32,4 +19,65 @@
       </div>
     </div>
   </ng-template>
+
+  <!-- ⌛ Últims Twitch -->
+  <app-slider
+    *ngIf="!isLoadingLatestTwitch; else skTwitchL"
+    [title]="'⌛ Ultims Twitch'"
+    [items]="latestTwitch"
+    [numVisible]="4"
+    [numScroll]="1"
+  ></app-slider>
+  <ng-template #skTwitchL>
+    <div class="row">
+      <div *ngFor="let i of [1,2,3,4]" class="col-md-3 mb-3">
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ⭐️ Destacats YouTube -->
+  <app-slider
+    *ngIf="!isLoadingFeaturedYoutube; else skYTF"
+    [title]="'⭐️ Destacats YouTube'"
+    [items]="featuredYoutube"
+    [numVisible]="4"
+    [numScroll]="1"
+  ></app-slider>
+  <ng-template #skYTF>
+    <div class="row">
+      <div *ngFor="let i of [1,2,3,4]" class="col-md-3 mb-3">
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ⌛ Últims YouTube -->
+  <app-slider
+    *ngIf="!isLoadingLatestYoutube; else skYTL"
+    [title]="'⌛ Ultims YouTube'"
+    [items]="latestYoutube"
+    [numVisible]="4"
+    [numScroll]="1"
+  ></app-slider>
+  <ng-template #skYTL>
+    <div class="row">
+      <div *ngFor="let i of [1,2,3,4]" class="col-md-3 mb-3">
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
 </div>

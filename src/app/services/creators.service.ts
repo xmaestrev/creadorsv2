@@ -83,6 +83,16 @@ export class CreatorsService {
     return this.http.get<Video[]>(`${this.baseUrl}/videos/ultims/youtube/`);
   }
 
+    /** Destacats de Twitch */
+  getDestacatsTwitch(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/videos/destacats/twitch/`);
+  }
+
+  /** Destacats de YouTube */
+  getDestacatsYoutube(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/videos/destacats/youtube/`);
+  }
+
   /**
    * Obtiene vídeos por categoría y plataforma (Twitch o YouTube).
    * categoryId es el ID interno de la categoría (p.e. 1, 2, etc.).

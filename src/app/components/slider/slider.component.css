@@ -78,3 +78,17 @@
   font-family: 'Roboto', sans-serif;
   font-weight: 500;
 }
+
+/* fuerza siempre 4 ranuras de 25% */
+.p-carousel-item {
+  flex: 0 0 25% !important;
+  max-width: 25% !important;
+}
+
+/* Avatar del creador dentro del carrusel */
+.creator-profile {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;   /* evita deformaciones */
+}
