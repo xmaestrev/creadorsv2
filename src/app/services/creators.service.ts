@@ -97,14 +97,14 @@ export class CreatorsService {
    * Obtiene vídeos por categoría y plataforma (Twitch o YouTube).
    * categoryId es el ID interno de la categoría (p.e. 1, 2, etc.).
    */
-  getVideosByCategory(
-    categoryId: string | number,
-    platform: 'twitch' | 'youtube'
-  ): Observable<Video[]> {
-    return this.http.get<Video[]>(
-      `${this.baseUrl}/videos/categoria/${categoryId}/${platform}/`
-    );
-  }
+  // getVideosByCategory(
+  //   categoryId: string | number,
+  //   platform: 'twitch' | 'youtube'
+  // ): Observable<Video[]> {
+  //   return this.http.get<Video[]>(
+  //     `${this.baseUrl}/videos/categoria/${categoryId}/${platform}/`
+  //   );
+  // }
 
   // ------------------------------------------
   // DIRECTOS

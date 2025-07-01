@@ -1,45 +1,57 @@
-<nav class="navbar navbar-expand-lg py-4" style="background-color: #221b7d">
+<nav class="navbar navbar-expand-lg py-4" style="background-color:#221b7d">
   <div class="container-fluid">
-    <!-- LOGO / BRAND -->
+    <!-- Brand -->
     <a class="navbar-brand text-white" [routerLink]="['/']">Creadors.TV</a>
-    <!-- Botón hamburguesa -->
-    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-            aria-expanded="false" aria-label="Toggle navigation" style="border-color: #ffffff">
-      <span class="navbar-toggler-icon" style="filter: invert(100%)"></span>
+
+    <!-- Burger -->
+    <button class="navbar-toggler text-white" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation" style="border-color:#fff">
+      <span class="navbar-toggler-icon" style="filter:invert(100%)"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!-- Menú izquierdo -->
+      <!-- Enlaces -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/qui-som/">Qui som?</a>
+          <a class="nav-link text-white" target="_blank"
+             href="https://www.creadors.tv/qui-som/">Qui som?</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white" target="_blank" href="https://www.creadors.tv/alta-socis/">Fes-te'n soci/a</a>
+          <a class="nav-link text-white" target="_blank"
+             href="https://www.creadors.tv/alta-socis/">Fes-te'n soci/a</a>
         </li>
       </ul>
-      <!-- Formulari de cerca integrado -->
+
+      <!-- Formulario de búsqueda -->
       <form class="d-flex align-items-center gap-3 mb-2 mb-lg-0">
-        <!-- Select de categorías -->
-        <div>
-          <select class="form-select me-2" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)" name="categoria">
-            <option value="" selected>Selecciona una categoría</option>
-            <option value="todas">Todas las categorías</option>
-            <option *ngFor="let category of categories" [value]="category.categoryId">
-              {{ category.title }}
-            </option>
-          </select>
-        </div>
-        <!-- Grupo de inputs para la búsqueda -->
+        <!-- Categorías -->
+        <select class="form-select me-2"
+                [(ngModel)]="selectedCategory"
+                name="categoria"
+                (change)="onCategoryChange($event)">
+          <option value="">Selecciona una categoría</option>
+          <option value="todas">Todas las categorías</option>
+          <option *ngFor="let cat of categories" [value]="cat.categoryId">
+            {{ cat.title }}
+          </option>
+        </select>
+
+        <!-- Texto + tipo -->
         <div class="d-flex gap-2">
-          <input type="text" [(ngModel)]="searchText" name="searchText" placeholder="Cercar..." class="form-control">
-          <!-- Select para tipo de búsqueda -->
-          <select class="form-select" [(ngModel)]="selectedSearchType" name="selectedSearchType">
+          <input type="text" class="form-control" name="searchText"
+                 placeholder="Cercar…" [(ngModel)]="searchText" />
+
+          <select class="form-select" name="selectedSearchType"
+                  [(ngModel)]="selectedSearchType">
             <option value="all">Tots</option>
             <option value="videos">Vídeos</option>
             <option value="creadors">Creadors</option>
           </select>
-          <button type="button" (click)="goToCercar()" class="btn btn-primary">Cercar</button>
+
+          <button type="button" class="btn btn-primary"
+                  (click)="goToCercar()">Cercar</button>
         </div>
       </form>
     </div>

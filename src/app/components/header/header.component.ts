@@ -7,19 +7,15 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterModule,
-  ],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  styleUrls: ['./header.component.css'],
 })
 export class HeaderComponent implements OnInit {
-  categories: any[] = [];
-  selectedCategory: string = '';
-  searchText: string = '';
-  selectedSearchType: string = 'all';
+  categories: any[]   = [];
+  selectedCategory    = '';
+  searchText          = '';
+  selectedSearchType  = 'all';
 
   constructor(
     private creatorsService: CreatorsService,
@@ -27,61 +23,64 @@ export class HeaderComponent implements OnInit {
     private route: ActivatedRoute
   ) {}
 
+  /* ========== INIT ========== */
   ngOnInit(): void {
     this.loadCategories();
-    this.route.queryParams.subscribe(params => {
-      if (params['categoria']) {
-        this.selectedCategory = params['categoria'];
-      }
+    /*  sincronizamos el combo con la URL */
+    this.route.queryParams.subscribe(p => {
+      this.selectedCategory = p['categoria'] ?? '';
     });
   }
 
-  loadCategories(forceRefresh: boolean = false): void {
+  /* ========== CATEGORIES ========== */
+  loadCategories(forceRefresh = false): void {
     this.creatorsService.getCategories(forceRefresh).subscribe({
-      next: (cats) => {
-        this.categories = cats;
-        console.log('Categorías cargadas:', this.categories);
-      },
-      error: (err) => {
-        console.error('Error al cargar categorías', err);
-      }
+      next: (cats) => (this.categories = cats),
+      error: (err)  => console.error('Error cargando categorías:', err),
     });
   }
 
+  /* ========== COMBOS Y BUSCAR ========== */
+
+  /** Cambio en el combo de categorías */
   onCategoryChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const selected = target.value;
+    const selected = (event.target as HTMLSelectElement).value;
     this.selectedCategory = selected;
-    // Si el valor es vacío (opción "Selecciona una categoría"), redirige a la home.
+
     if (selected === '') {
+      /* vuelve a la home */
       this.router.navigate(['/']);
       this.searchText = '';
       this.selectedSearchType = 'all';
+      return;
+    }
+
+    if (selected === 'todas') {
+      /* “Totes les categories” ⇢ /cercar SIN parámetro */
+      this.router.navigate(['/cercar']);
     } else {
-      // Si se selecciona "Todas las categorías" u otra categoría, se navega a /cercar
-      this.router.navigate(['/cercar'], { queryParams: { categoria: selected } });
+      this.router.navigate(['/cercar'], { queryParams:{ categoria:selected }});
     }
   }
-  
 
+  /** Click en el botón “Cercar” */
   goToCercar(): void {
-    // Determinamos el valor del parámetro type[] según el select
-    let type: string[];
-    if (this.selectedSearchType === 'all') {
-      type = ['videos', 'creadors'];
-    } else {
-      type = [this.selectedSearchType];
-    }
-    // Construimos los query params, incluyendo el valor de selectedSearchType
-    const queryParams: any = { 
+    const type =
+      this.selectedSearchType === 'all'
+        ? ['videos', 'creadors']
+        : [this.selectedSearchType];
+
+    const queryParams: any = {
       text: this.searchText,
       'type[]': type,
-      selectedSearchType: this.selectedSearchType  // <-- Asegurarse de incluirlo
+      selectedSearchType: this.selectedSearchType,
     };
-    if (this.selectedCategory) {
+
+    /* solo añadimos categoria cuando sea válida */
+    if (this.selectedCategory && this.selectedCategory !== 'todas') {
       queryParams.categoria = this.selectedCategory;
     }
+
     this.router.navigate(['/cercar'], { queryParams });
   }
-  
 }
