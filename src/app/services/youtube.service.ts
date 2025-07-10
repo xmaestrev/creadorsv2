@@ -20,6 +20,7 @@ export interface YoutubeVideo {
   viewCount?   : string;
   creator?     : string;   // nombre del canal (para sliders)
   creatorImage?: string;   // avatar del canal
+  url?:string;
 }
 
 @Injectable({ providedIn: 'root' })
