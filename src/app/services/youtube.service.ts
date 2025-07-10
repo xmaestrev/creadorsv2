@@ -18,20 +18,22 @@ export interface YoutubeVideo {
   viewCount?: string;
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class YoutubeService {
   constructor(private http: HttpClient) {}
 
-  getVideoDetailsById(videoID: string): Observable<any> {
-    const params = new HttpParams()
-      .set('key', YOUTUBE_API_KEY)
-      .set('part', 'snippet')
-      .set('id', videoID);
-    return this.http.get(`${YOUTUBE_API_URL}/videos`, { params });
-  }
+getVideoDetailsById(id:string){
+  const params=new HttpParams()
+     .set('key',YOUTUBE_API_KEY)
+     .set('id',id)
+     .set('part','snippet,statistics,contentDetails');
+  return this.http.get(`${YOUTUBE_API_URL}/videos`,{params});
+}
 
-  getRelatedVideos(videoID: string, maxResults: number = 8): Observable<YoutubeVideo[]> {
+  getRelatedVideos(
+    videoID: string,
+    maxResults: number = 8
+  ): Observable<YoutubeVideo[]> {
     const params = new HttpParams()
       .set('key', YOUTUBE_API_KEY)
       .set('part', 'snippet')
@@ -39,15 +41,17 @@ export class YoutubeService {
       .set('type', 'video')
       .set('maxResults', maxResults.toString());
     return this.http.get<any>(`${YOUTUBE_API_URL}/search`, { params }).pipe(
-      map(resp => (resp.items || []).map((item: any) => ({
-        videoId:     item.id.videoId,
-        title:       item.snippet.title,
-        description: item.snippet.description || '',
-        thumbnail:   item.snippet.thumbnails.medium.url,
-        publishedAt: item.snippet.publishedAt,
-        duration:    '',  // placeholder
-        viewCount:   ''   // placeholder si lo vas a usar
-      })))
+      map((resp) =>
+        (resp.items || []).map((item: any) => ({
+          videoId: item.id.videoId,
+          title: item.snippet.title,
+          description: item.snippet.description || '',
+          thumbnail: item.snippet.thumbnails.medium.url,
+          publishedAt: item.snippet.publishedAt,
+          duration: '', // placeholder
+          viewCount: '', // placeholder si lo vas a usar
+        }))
+      )
     );
   }
 
@@ -58,16 +62,19 @@ export class YoutubeService {
       .set('q', channelName)
       .set('type', 'channel');
     return this.http.get<any>(`${YOUTUBE_API_URL}/search`, { params }).pipe(
-      switchMap(res => {
+      switchMap((res) => {
         if (res.items?.length) return from([res.items[0].snippet.channelId]);
         throw new Error(`Channel not found: ${channelName}`);
       })
     );
   }
 
-  getChannelVideosByName(channelName: string, maxResults: number = 4): Observable<any> {
+  getChannelVideosByName(
+    channelName: string,
+    maxResults: number = 4
+  ): Observable<any> {
     return this.getChannelIdByName(channelName).pipe(
-      switchMap(id => {
+      switchMap((id) => {
         const params = new HttpParams()
           .set('key', YOUTUBE_API_KEY)
           .set('part', 'snippet')
@@ -78,4 +85,13 @@ export class YoutubeService {
       })
     );
   }
+
+getChannelDetailsById(channelId: string) {
+  const params = new HttpParams()
+    .set('key', YOUTUBE_API_KEY)
+    .set('id', channelId)
+    .set('part', 'snippet,statistics');
+
+  return this.http.get<any>(`${YOUTUBE_API_URL}/channels`, { params });
+}
 }

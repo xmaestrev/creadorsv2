@@ -1,7 +1,13 @@
 .slider-container {
   margin-bottom: 2rem;
 }
-
+.slider-header > h1 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  color: #221B7D;
+  margin-bottom: 0.5rem;
+  margin-left: 20px;
+}
 .slider-header {
   margin-bottom: 1rem;
 }
@@ -41,11 +47,12 @@
   flex-grow: 1; /* Hace que el contenido ocupe el espacio necesario */
   display: flex;
   flex-direction: column;
+  min-height: 172px;
 }
 
 /* Limitar título a 2 líneas */
 .card-title {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   white-space: normal;
   overflow: hidden;
@@ -91,4 +98,11 @@
   height: 30px;
   border-radius: 50%;
   object-fit: cover;   /* evita deformaciones */
+}
+
+.slider-header > h5 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  color: #221B7D;
+  margin-bottom: 0.5rem;
 }

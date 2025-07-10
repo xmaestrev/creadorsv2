@@ -1,3 +1,10 @@
+/* badge colores */
+.bg-purple { background:#9146FF!important; }  /* Twitch morado */
+.bg-danger { background:#FF0000!important; }  /* YouTube rojo */
+
+/* …resto de estilos se mantienen… */
+
+
 .custom-container {
   margin-left: 3em;
   margin-right: 3em;

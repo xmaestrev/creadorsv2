@@ -1,108 +1,145 @@
-/* creator.component.css */
+/* Contenedor principal */
+.creator-container {
+  margin: 0 5em;
+  padding-top: 5em;
+}
 
-/* Contenedor de cada tarjeta esqueleto */
+h1 {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  color: #221B7D;
+  margin-bottom: 1rem;
+}
+
+/* Header */
+.creator-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto 1rem;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+p.text-muted {
+  text-align: center;
+  color: #666;
+}
+
+/* Secciones */
+h3 {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.row {
+  margin-bottom: 1rem;
+}
+
+/* Tarjetas */
+.item-card {
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.item-card .card-img-top {
+  object-fit: cover;
+  height: 240px !important;
+  width: 100%;
+}
+
+/* Estilo uniforme para las tarjetas */
+.card {
+  height: 100%; /* Asegurar que todas las tarjetas tengan la misma altura */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor del texto dentro de la tarjeta */
+.card-body {
+  flex-grow: 1; /* Hace que el contenido ocupe el espacio necesario */
+  display: flex;
+  flex-direction: column;
+  min-height: 168px;
+}
+
+/* Limitar título a 2 líneas */
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.5rem; /* Mantener altura uniforme */
+  color: #221B7D;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+}
+
+/* Limitar descripción a 2 líneas */
+.card-text {
+  font-size: 0.9rem;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 2.7rem; /* Mantener altura uniforme */
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+}
+
+/* Botón Ver más */
+.btn-link {
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Skeleton Loader */
 .skeleton-card {
   background: #f0f0f0;
   border-radius: 8px;
   overflow: hidden;
-  position: relative;
 }
-
-/* Bloque de imagen */
 .skeleton-img {
   background: #e0e0e0;
   width: 100%;
+  height: 180px;
   animation: pulse 1.5s ease-in-out infinite;
 }
-
-/* Líneas de texto */
 .skeleton-title {
   background: #e0e0e0;
-  border-radius: 4px;
+  height: 20px;
+  margin: 0.75rem auto;
+  width: 60%;
   animation: pulse 1.5s ease-in-out infinite;
 }
-
-.skeleton-text {
-  background: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s ease-in-out infinite;
+@keyframes pulse {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
-/* Opcional: avatar circular */
-.skeleton-img.rounded-circle {
+/* Loader header */
+.sk .skeleton-img.rounded-circle {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
 }
-
-/* Animación de pulsación */
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 1;
-  }
+.sk .skeleton-title {
+  height: 24px;
+  width: 50%;
 }
-
-/* Ajustes de tamaño para el header skeleton */
-.creator-container .skeleton-img.rounded-circle {
-  display: inline-block;
+.sk .skeleton-text {
+  height: 16px;
+  width: 60%;
 }
-
-.creator-container .skeleton-title {
-  height: 20px;
-  margin: 0.5rem auto;
-}
-
-.creator-container .skeleton-text {
-  height: 14px;
-  margin: 0.25rem auto;
-}
-
-/* Margen en secciones */
-.videos-section .skeleton-title {
-  height: 18px;
-  margin-bottom: 1rem;
-}
-
-.videos-section .skeleton-card {
-  padding: 0.5rem;
-}
-
-
-.creator-container {
-    margin-left: 5em;
-    margin-right: 5em;
-    padding-top: 5em;
-}
-  
-  /* Imagen del creador */
-  .creator-image {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  
-  /* Nombre */
-  .creator-name {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Descripción */
-  .creator-description {
-    font-size: 1rem;
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    color: #666;
-  }
-  
-  /* Sección de videos */
-  .videos-section {
-    margin-top: 2rem;
-  }
-  

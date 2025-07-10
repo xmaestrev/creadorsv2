@@ -1,59 +1,40 @@
 <div class="custom-container mt-4">
+
+  <!-- =================================================================== -->
   <h2 class="category-header mb-4">Resultats de la cerca</h2>
 
-  <!-- ▸  FILTROS  ---------------------------------------------------------->
-  <!-- ⬇︎ quitamos el chequeo de videos.length -->
-  <div
-    class="filters d-flex flex-wrap gap-2 mb-4"
-    *ngIf="
-      !isLoading &&
-      (selectedSearchType === 'all' || selectedSearchType === 'videos')
-    "
-  >
-    <!-- Plataforma -->
-    <select
-      class="form-select"
-      [(ngModel)]="platformFilter"
-      (ngModelChange)="onFiltersChanged()"
-    >
+  <!-- ▸ FILTROS --------------------------------------------------------- -->
+  <div class="filters d-flex flex-wrap gap-2 mb-4"
+       *ngIf="!isLoading && (selectedSearchType==='all' || selectedSearchType==='videos')">
+
+    <select class="form-select" [(ngModel)]="platformFilter" (ngModelChange)="onFiltersChanged()">
       <option value="all">Plataforma: Totes</option>
       <option value="twitch">Twitch</option>
       <option value="youtube">YouTube</option>
     </select>
 
-    <!-- Orden -->
-    <select
-      class="form-select"
-      [(ngModel)]="orderFilter"
-      (ngModelChange)="onFiltersChanged()"
-    >
+    <select class="form-select" [(ngModel)]="orderFilter" (ngModelChange)="onFiltersChanged()">
       <option value="recent">Més recent</option>
       <option value="oldest">Més antic</option>
     </select>
 
-    <!-- Clips / Emissions (deshabilitado cuando es YouTube) -->
-    <select
-      class="form-select"
-      [disabled]="platformFilter === 'youtube'"
-      [(ngModel)]="twitchTypeFilter"
-      (ngModelChange)="onFiltersChanged()"
-    >
+    <select class="form-select"
+            [disabled]="platformFilter==='youtube'"
+            [(ngModel)]="twitchTypeFilter"
+            (ngModelChange)="onFiltersChanged()">
       <option value="all">Tots</option>
       <option value="clip">Clips</option>
       <option value="emission">Emissions</option>
     </select>
 
-    <!-- Botón RESET -->
-    <button class="btn btn-outline-secondary" (click)="resetVideoFilters()">
-      Reinicia filtres
-    </button>
+    <button class="btn btn-outline-secondary" (click)="resetVideoFilters()">Reinicia filtres</button>
   </div>
-  <!-- ---------------------------------------------------------------------->
+  <!-- ------------------------------------------------------------------- -->
 
-  <!-- SKELETON -->
+  <!-- ======================   SKELETON   =============================== -->
   <ng-container *ngIf="isLoading">
     <div class="row">
-      <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="col-md-3 mb-3">
+      <div *ngFor="let i of [1,2,3,4,5,6]" class="col-md-3 mb-3">
         <div class="skeleton-card">
           <div class="skeleton-img"></div>
           <div class="skeleton-title"></div>
@@ -63,86 +44,84 @@
     </div>
   </ng-container>
 
-  <!-- ==============  VÍDEOS  ==================-->
-  <h3
-    class="mb-3"
-    *ngIf="
-      !isLoading &&
-      videos.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'videos')
-    "
-  >
+  <!-- =======================   VÍDEOS   ================================ -->
+  <h3 class="mb-3"
+      *ngIf="!isLoading && videos.length && (selectedSearchType==='all' || selectedSearchType==='videos')">
     Vídeos
   </h3>
 
-  <!-- primeros 4 -->
-  <div
-    class="row"
-    *ngIf="
-      firstFourVideos.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'videos')
-    "
-  >
+  <!-- --- BLOQUE 1: primeros 4 --- -->
+  <div class="row"
+       *ngIf="firstFourVideos.length && (selectedSearchType==='all' || selectedSearchType==='videos')">
     <div class="col-md-3 mb-3" *ngFor="let v of firstFourVideos">
-      <div
-        class="card position-relative"
-        style="cursor: pointer"
-        (click)="navigateToVideo(v)"
-      >
-        <img [src]="v.thumbnail" class="card-img-top" />
-        <span
-          *ngIf="v.duration"
-          class="badge bg-dark position-absolute bottom-0 end-0 m-2"
-          >{{ v.duration }}</span
-        >
+      <!-- -------- CARD -------- -->
+      <div class="card position-relative" style="cursor:pointer" (click)="navigateToVideo(v)">
+
+        <!-- thumbnail + badges -->
+        <div class="position-relative">
+          <img [src]="v.thumbnail" class="card-img-top" alt="thumbnail">
+
+          <span *ngIf="v.duration"
+                class="badge bg-dark position-absolute bottom-0 end-0 m-2">{{v.duration}}</span>
+
+          <span *ngIf="v.platform==='twitch'"
+                class="badge bg-purple position-absolute top-0 start-0 m-2">Twitch</span>
+          <span *ngIf="v.platform==='youtube'"
+                class="badge bg-danger position-absolute top-0 start-0 m-2">YouTube</span>
+        </div>
+
+        <!-- cuerpo -->
         <div class="card-body">
-          <h5 class="card-title">{{ v.title }}</h5>
+          <h5 class="card-title">{{v.title}}</h5>
+
           <div class="d-flex align-items-center">
-            <img
-              [src]="v.creatorImage"
-              class="me-1"
-              style="width: 30px; height: 30px; border-radius: 50%"
-            />
-            <small class="creator-name">{{ v.creator }}</small>
+            <img [src]="v.creatorImage"
+                 class="me-1" style="width:30px;height:30px;border-radius:50%">
+            <small class="creator-name"
+                   [class.link]="v.creatorId"
+                   (click)="v.creatorId && onCreatorClick($event,v.creatorId)">
+              {{v.creator}}
+            </small>
           </div>
-          <p class="card-text">{{ v.description }}</p>
+
+          <p class="card-text">{{v.description}}</p>
         </div>
       </div>
+      <!-- ----------------------- -->
     </div>
   </div>
 
-  <!-- resto -->
-  <div
-    class="row"
-    *ngIf="
-      restOfVideos.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'videos')
-    "
-  >
-    <div
-      class="col-md-3 mb-3"
-      *ngFor="let v of restOfVideos | slice : 0 : displayedRestVideosCount"
-    >
-      <div
-        class="card position-relative"
-        style="cursor: pointer"
-        (click)="navigateToVideo(v)"
-      >
-        <img [src]="v.thumbnail" class="card-img-top" />
-        <span
-          *ngIf="v.duration"
-          class="badge bg-dark position-absolute bottom-0 end-0 m-2"
-          >{{ v.duration }}</span
-        >
+  <!-- --- BLOQUE 2: resto de vídeos --- -->
+  <div class="row"
+       *ngIf="restOfVideos.length && (selectedSearchType==='all' || selectedSearchType==='videos')">
+    <div class="col-md-3 mb-3"
+         *ngFor="let v of restOfVideos | slice : 0 : displayedRestVideosCount">
+      <!-- (misma card reutilizada) -->
+      <div class="card position-relative" style="cursor:pointer" (click)="navigateToVideo(v)">
+
+        <div class="position-relative">
+          <img [src]="v.thumbnail" class="card-img-top" alt="thumbnail">
+
+          <span *ngIf="v.duration"
+                class="badge bg-dark position-absolute bottom-0 end-0 m-2">{{v.duration}}</span>
+
+          <span *ngIf="v.platform==='twitch'"
+                class="badge bg-purple position-absolute top-0 start-0 m-2">Twitch</span>
+          <span *ngIf="v.platform==='youtube'"
+                class="badge bg-danger position-absolute top-0 start-0 m-2">YouTube</span>
+        </div>
+
         <div class="card-body">
-          <h5 class="card-title">{{ v.title }}</h5>
+          <h5 class="card-title">{{v.title}}</h5>
+
           <div class="d-flex align-items-center">
-            <img
-              [src]="v.creatorImage"
-              class="me-1"
-              style="width: 30px; height: 30px; border-radius: 50%"
-            />
-            <small class="creator-name">{{ v.creator }}</small>
+            <img [src]="v.creatorImage"
+                 class="me-1" style="width:30px;height:30px;border-radius:50%">
+            <small class="creator-name"
+                   [class.link]="v.creatorId"
+                   (click)="v.creatorId && onCreatorClick($event,v.creatorId)">
+              {{v.creator}}
+            </small>
           </div>
         </div>
       </div>
@@ -150,113 +129,61 @@
   </div>
 
   <!-- botón “veure més vídeos” -->
-  <div
-    class="text-center"
-    *ngIf="
-      restOfVideos.length > displayedRestVideosCount &&
-      (selectedSearchType === 'all' || selectedSearchType === 'videos')
-    "
-  >
-    <button class="btn btn-link" (click)="loadMoreVideos()">
-      Veure més vídeos
-    </button>
+  <div class="text-center"
+       *ngIf="restOfVideos.length > displayedRestVideosCount && (selectedSearchType==='all' || selectedSearchType==='videos')">
+    <button class="btn btn-link" (click)="loadMoreVideos()">Veure més vídeos</button>
   </div>
 
   <!-- mensaje sin vídeos -->
-  <p
-    class="text-center"
-    *ngIf="
-      !isLoading &&
-      !videos.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'videos')
-    "
-  >
+  <p class="text-center"
+     *ngIf="!isLoading && !videos.length && (selectedSearchType==='all' || selectedSearchType==='videos')">
     No hi ha vídeos per aquesta cerca.
   </p>
 
-  <!-- ==============  CREADORS  ===============-->
-  <h3
-    class="mb-3 mt-5"
-    *ngIf="
-      !isLoading &&
-      creators.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'creadors')
-    "
-  >
+
+  <!-- ====================   CREADORS   ================================ -->
+  <h3 class="mb-3 mt-5"
+      *ngIf="!isLoading && creators.length && (selectedSearchType==='all' || selectedSearchType==='creadors')">
     Creadors
   </h3>
 
   <!-- primeros 4 -->
-  <div
-    class="row"
-    *ngIf="
-      firstFourCreators.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'creadors')
-    "
-  >
+  <div class="row"
+       *ngIf="firstFourCreators.length && (selectedSearchType==='all' || selectedSearchType==='creadors')">
     <div class="col-md-3 mb-3" *ngFor="let c of firstFourCreators">
-      <div
-        class="creator-card text-center"
-        style="cursor: pointer"
-        (click)="navigateToCreator(c)"
-      >
-        <img
-          [src]="c.imageUrl || 'assets/img/default-creator-profile.png'"
-          class="creator-image mb-2"
-        />
-        <h5 class="creator-name">{{ c.name }}</h5>
+      <div class="creator-card text-center" style="cursor:pointer"
+           (click)="navigateToCreator(c)">
+        <img [src]="c.imageUrl || 'assets/img/default-creator-profile.png'"
+             class="creator-image mb-2">
+        <h5 class="creator-name">{{c.name}}</h5>
       </div>
     </div>
   </div>
 
   <!-- resto -->
-  <div
-    class="row"
-    *ngIf="
-      restOfCreators.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'creadors')
-    "
-  >
-    <div
-      class="col-md-3 mb-3"
-      *ngFor="let c of restOfCreators | slice : 0 : displayedRestCreatorsCount"
-    >
-      <div
-        class="creator-card text-center"
-        style="cursor: pointer"
-        (click)="navigateToCreator(c)"
-      >
-        <img
-          [src]="c.imageUrl || 'assets/img/default-creator-profile.png'"
-          class="creator-image mb-2"
-        />
-        <h5 class="creator-name">{{ c.name }}</h5>
+  <div class="row"
+       *ngIf="restOfCreators.length && (selectedSearchType==='all' || selectedSearchType==='creadors')">
+    <div class="col-md-3 mb-3"
+         *ngFor="let c of restOfCreators | slice:0:displayedRestCreatorsCount">
+      <div class="creator-card text-center" style="cursor:pointer"
+           (click)="navigateToCreator(c)">
+        <img [src]="c.imageUrl || 'assets/img/default-creator-profile.png'"
+             class="creator-image mb-2">
+        <h5 class="creator-name">{{c.name}}</h5>
       </div>
     </div>
   </div>
 
   <!-- “veure més creadors” -->
-  <div
-    class="text-center"
-    *ngIf="
-      restOfCreators.length > displayedRestCreatorsCount &&
-      (selectedSearchType === 'all' || selectedSearchType === 'creadors')
-    "
-  >
-    <button class="btn btn-link" (click)="loadMoreCreators()">
-      Veure més creadors
-    </button>
+  <div class="text-center"
+       *ngIf="restOfCreators.length > displayedRestCreatorsCount && (selectedSearchType==='all' || selectedSearchType==='creadors')">
+    <button class="btn btn-link" (click)="loadMoreCreators()">Veure més creadors</button>
   </div>
 
   <!-- sin creadors -->
-  <p
-    class="text-center"
-    *ngIf="
-      !isLoading &&
-      !creators.length &&
-      (selectedSearchType === 'all' || selectedSearchType === 'creadors')
-    "
-  >
+  <p class="text-center"
+     *ngIf="!isLoading && !creators.length && (selectedSearchType==='all' || selectedSearchType==='creadors')">
     No hi ha creadors per aquesta cerca.
   </p>
+
 </div>

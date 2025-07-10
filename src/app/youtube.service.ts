@@ -41,6 +41,9 @@ interface ChannelIdResponse {
 
 @Injectable({ providedIn: 'root' })
 export class YoutubeService {
+  getChannelDetailsById(channelId: string) {
+    throw new Error('Method not implemented.');
+  }
   private baseUrl = 'https://www.googleapis.com/youtube/v3';
   private apiKey = 'AIzaSyCiToKgB7XO6BboRAYo883uIqfCrLTCKK4';
 

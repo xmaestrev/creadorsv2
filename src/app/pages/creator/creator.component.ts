@@ -1,26 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CreatorsService, Creator } from '../../services/creators.service';
 import { CommonModule } from '@angular/common';
-import { SliderComponent } from '../../components/slider/slider.component';
+import { CreatorsService, Creator } from '../../services/creators.service';
 
 @Component({
   selector: 'app-creator',
   standalone: true,
-  imports: [CommonModule, SliderComponent],
+  imports: [CommonModule],
   templateUrl: './creator.component.html',
   styleUrls: ['./creator.component.css']
 })
 export class CreatorComponent implements OnInit {
-
   creatorId!: string;
   creator: Creator | null = null;
   isLoading = true;
 
-  // Arrays para cada slider
   twitchClips: any[] = [];
   twitchVideos: any[] = [];
   youtubeVideos: any[] = [];
+
+  // Para la paginación “Ver más”
+  first4 = 4;
+  displayed = 8;
 
   constructor(
     private route: ActivatedRoute,
@@ -35,109 +36,91 @@ export class CreatorComponent implements OnInit {
         this.creatorId = id;
         this.loadCreatorInfo();
       } else {
-        console.error('No se recibió el ID del creador por query param');
+        console.error('Falta el queryParam id del creador');
       }
     });
   }
 
-  loadCreatorInfo(): void {
+  private loadCreatorInfo(): void {
     this.isLoading = true;
     this.creatorsService.getCreatorById(this.creatorId).subscribe({
-      next: (data) => {
+      next: data => {
         this.creator = data;
         this.processCreatorContent(data);
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Error al cargar creador:', err);
+      error: err => {
+        console.error('Error cargando creador:', err);
         this.isLoading = false;
       }
     });
   }
 
-  private processCreatorContent(creatorData: Creator) {
-    // default profile pic
-    const profileImg = creatorData.imageUrl?.trim()
-      ? creatorData.imageUrl
+  private processCreatorContent(data: Creator) {
+    const profileImg = data.imageUrl?.trim()
+      ? data.imageUrl
       : 'assets/img/default-creator-profile.png';
 
-    this.twitchClips = [];
-    this.twitchVideos = [];
+    this.twitchClips   = [];
+    this.twitchVideos  = [];
     this.youtubeVideos = [];
 
-    const channelsObj = (creatorData as any).linkedchannels || {};
-    Object.values(channelsObj).forEach((channel: any) => {
-      if (channel.type === 'twitch') {
-
+    const linked = (data as any).linkedchannels || {};
+    Object.values(linked).forEach((ch: any) => {
+      if (ch.type === 'twitch') {
         // Clips
-        if (Array.isArray(channel.clips)) {
-          channel.clips.forEach((clip: any) => {
-            let thumb = clip.thumbnail_url;
-            if (thumb?.includes('%{width}')) {
-              thumb = thumb.replace(/%\{width\}/g,'320').replace(/%\{height\}/g,'180');
-            }
-            this.twitchClips.push({
-              title: clip.title,
-              url: clip.url,
-              thumbnail: thumb,
-              description: clip.creator_name || '',
-              duration: clip.duration ? clip.duration + 's' : '',
-              creator: creatorData.name,
-              creatorId: creatorData.creatorId,
-              creatorImage: profileImg
-            });
+        (ch.clips || []).forEach((c: any) => {
+          let thumb = c.thumbnail_url;
+          if (thumb?.includes('%{width}')) {
+            thumb = thumb.replace(/%\{width\}/g,'320')
+                         .replace(/%\{height\}/g,'180');
+          }
+          this.twitchClips.push({
+            title: c.title,
+            url:    c.url,
+            thumbnail: thumb,
+            creator:   data.name,
+            creatorId:data.creatorId,
+            creatorImage: profileImg
           });
-        }
-
+        });
         // Videos
-        if (Array.isArray(channel.videos)) {
-          channel.videos.forEach((vid: any) => {
-            let thumb = vid.thumbnail_url;
-            if (thumb?.includes('%{width}')) {
-              thumb = thumb.replace(/%\{width\}/g,'320').replace(/%\{height\}/g,'180');
-            }
-            this.twitchVideos.push({
-              title: vid.title,
-              url: vid.url,
-              thumbnail: thumb,
-              description: vid.description || '',
-              duration: vid.duration ? vid.duration + 's' : '',
-              creator: creatorData.name,
-              creatorId: creatorData.creatorId,
-              creatorImage: profileImg
-            });
+        (ch.videos || []).forEach((v: any) => {
+          let thumb = v.thumbnail_url;
+          if (thumb?.includes('%{width}')) {
+            thumb = thumb.replace(/%\{width\}/g,'320')
+                         .replace(/%\{height\}/g,'180');
+          }
+          this.twitchVideos.push({
+            title: v.title,
+            url:    v.url,
+            thumbnail: thumb,
+            creator:   data.name,
+            creatorId:data.creatorId,
+            creatorImage: profileImg
           });
-        }
-
-      } else if (channel.type === 'youtube') {
-        // YouTube videos
-        if (Array.isArray(channel.videos)) {
-          channel.videos.forEach((vid: any) => {
-            this.youtubeVideos.push({
-              title: vid.title,
-              url: `https://www.youtube.com/watch?v=${vid.video_id}`,
-              thumbnail: vid.thumbnail_url,
-              description: vid.description || '',
-              duration: vid.duration ? vid.duration + 's' : '',
-              creator: creatorData.name,
-              creatorId: creatorData.creatorId,
-              creatorImage: profileImg
-            });
+        });
+      }
+      if (ch.type === 'youtube') {
+        (ch.videos || []).forEach((v: any) => {
+          this.youtubeVideos.push({
+            title: v.title,
+            url:    `https://www.youtube.com/watch?v=${v.video_id}`,
+            thumbnail: v.thumbnail_url,
+            creator:   data.name,
+            creatorId:data.creatorId,
+            creatorImage: profileImg
           });
-        }
+        });
       }
     });
   }
 
-  goToContent(item: any): void {
-    window.open(item.url, '_blank', 'noopener,noreferrer');
+  open(url: string) {
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  navigateToCreator(): void {
-    this.router.navigate(['/creador'], { queryParams: { id: this.creator!.creatorId } });
-  }
-
-  viewAllContent(type: string): void {
-    alert(`Funcionalidad "Ver todos" para ${type} pendiente de implementar...`);
+  loadMore() {
+    this.displayed += this.first4;
   }
 }

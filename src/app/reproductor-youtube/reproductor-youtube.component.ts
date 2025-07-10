@@ -1,46 +1,45 @@
-// src/app/reproductor-youtube/reproductor-youtube.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { forkJoin, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+
 import { YoutubeService } from '../youtube.service';
 import { SafeUrlPipe } from '../pipes/safe-url.pipe';
 import { SliderComponent } from '../components/slider/slider.component';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
+/* ---------- Tipos ---------- */
 export interface YoutubeVideo {
-  videoId:     string;
-  title:       string;
+  videoId: string;
+  title: string;
   description: string;
-  thumbnail:   string;
+  thumbnail: string;
   publishedAt: string;
-  tags?:       string[];
+  tags?: string[];
+  viewCount?: number; // ← numérico
 }
 
 @Component({
   selector: 'app-reproductor-youtube',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    SafeUrlPipe,
-    SliderComponent   // ¡importamos tu slider personalizado!
-  ],
+  imports: [CommonModule, RouterModule, SafeUrlPipe, SliderComponent],
   templateUrl: './reproductor-youtube.component.html',
   styleUrls: ['./reproductor-youtube.component.css'],
 })
 export class ReproductorYoutubeComponent implements OnInit {
   videoId!: string;
   video?: YoutubeVideo;
-  related: YoutubeVideo[]      = [];
-  moreFromChannel: YoutubeVideo[] = [];
-  videoTags: string[]          = [];
-  isLoading = true;
 
-  // Canal
-  channelName      = '';
+  related: YoutubeVideo[] = [];
+  moreFromChannel: YoutubeVideo[] = [];
+
+  /* Info canal */
+  channelId = '';
+  channelName = '';
   channelAvatarUrl = '/placeholder.svg?height=40&width=40';
-  subscriberCount  = '';
+  subscriberCount = '';
+
+  isLoading = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,75 +47,99 @@ export class ReproductorYoutubeComponent implements OnInit {
     private router: Router
   ) {}
 
+  /* ---------- Init ---------- */
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      let vid = (params['videoID'] as string || '').split('&')[0];
-      vid = decodeURIComponent(vid);
-      if (!vid) return console.error('Falta videoID');
-      if (vid !== this.videoId) {
-        this.videoId = vid;
-        this.loadVideo();
+    this.route.queryParams.subscribe((q) => {
+      const id = decodeURIComponent(q['videoID'] || '').split('&')[0];
+      if (id && id !== this.videoId) {
+        this.videoId = id;
+        this.load();
       }
     });
   }
 
-  private loadVideo(): void {
+  /* ----------- Carga ----------- */
+  private load(): void {
     this.isLoading = true;
 
-    // 1) Detalles del vídeo
-    this.yt.getVideoDetailsById(this.videoId).subscribe({
-      next: resp => {
-        const item: any = resp.items?.[0];
-        if (!item) {
-          console.error('No hay datos de vídeo', resp);
+    this.yt
+      .getVideoDetailsById(this.videoId)
+      .pipe(
+        switchMap((resp) => {
+          const item: any = resp.items?.[0];
+          if (!item) {
+            console.error('Sin datos', resp);
+            return of(null);
+          }
+
+          /* vídeo */
+          const sn: any = item.snippet;
+          const st: any = item.statistics ?? {};
+          this.video = {
+            videoId: this.videoId,
+            title: sn.title,
+            description: sn.description,
+            thumbnail: sn.thumbnails?.medium?.url,
+            publishedAt: sn.publishedAt,
+            tags: sn.tags || [],
+            viewCount: +st.viewCount || 0,
+          };
+
+          /* canal */
+          this.channelId = sn.channelId;
+          this.channelName = sn.channelTitle;
+
+          /* 👇 ¡ojo al paréntesis! */
+          return forkJoin({
+            related: this.yt
+              .getRelatedVideos(this.videoId, 8)
+              .pipe(catchError(() => of([]))),
+
+            more: this.yt
+              .getChannelVideosByName(this.channelName, 4)
+              .pipe(catchError(() => of({ items: [] }))),
+
+            channel: this.yt
+              .getChannelDetailsById(this.channelId)
+              .pipe(catchError(() => of({ items: [] }))),
+          });
+        })
+      )
+      .subscribe((bundle) => {
+        if (!bundle) {
           this.isLoading = false;
           return;
         }
-        const sn: any = item.snippet;
 
-        this.video = {
-          videoId:     this.videoId,
-          title:       sn.title || 'Untitled',
-          description: sn.description || '',
-          thumbnail:   sn.thumbnails?.medium?.url || '',
-          publishedAt: sn.publishedAt || '',
-          tags:        Array.isArray(sn.tags) ? sn.tags : []
-        };
-        this.videoTags = this.video.tags!;
+        this.related = bundle.related;
 
-        // Canal
-        this.channelName     = sn.channelTitle || this.channelName;
-        this.subscriberCount = '1 234 567 subscribers'; // placeholder
+        const items: any[] = (bundle.more as any).items || [];
+        this.moreFromChannel = items.map((v) => ({
+          videoId: v.id.videoId,
+          title: v.snippet.title,
+          description: v.snippet.description,
+          thumbnail: v.snippet.thumbnails.medium.url,
+          publishedAt: v.snippet.publishedAt,
+        }));
 
-        // 2) y 3) Relacionados + More from channel
-        forkJoin({
-          related: this.yt.getRelatedVideos(this.videoId, 8)
-            .pipe(catchError(_ => of([] as YoutubeVideo[]))),
-          more:    this.yt.getChannelVideosByName(this.channelName, 4)
-            .pipe(catchError(_ => of({ items: [] } as any)))
-        }).subscribe(({ related, more }) => {
-          this.related = related;
-          const items: any[] = (more as any).items || [];
-          this.moreFromChannel = items.map(v => ({
-            videoId:     v.id.videoId,
-            title:       v.snippet.title,
-            description: v.snippet.description || '',
-            thumbnail:   v.snippet.thumbnails.medium.url,
-            publishedAt: v.snippet.publishedAt
-          }));
-          this.isLoading = false;
-        });
-      },
-      error: err => {
-        console.error('Error cargando detalles:', err);
+        const ch: any = (bundle.channel as any).items?.[0];
+        if (ch) {
+          const thumbs = ch.snippet.thumbnails;
+          this.channelAvatarUrl =
+            thumbs?.high?.url || thumbs?.default?.url || this.channelAvatarUrl;
+          this.subscriberCount = ch.statistics?.subscriberCount
+            ? this.format(+ch.statistics.subscriberCount) + ' subscribers'
+            : '';
+        }
         this.isLoading = false;
-      }
-    });
+      });
   }
 
-  goTo(video: YoutubeVideo): void {
-    this.router.navigate([], {
-      queryParams: { videoID: video.videoId, ab_channel: this.channelName }
-    });
+  /* ----------- helpers ----------- */
+  goTo(v: YoutubeVideo) {
+    this.router.navigate([], { queryParams: { videoID: v.videoId } });
+  }
+  private format(n: number) {
+    return n.toLocaleString('en-US');
   }
 }

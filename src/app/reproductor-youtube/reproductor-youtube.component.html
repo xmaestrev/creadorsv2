@@ -1,138 +1,63 @@
-<!-- src/app/reproductor-youtube/reproductor-youtube.component.html -->
+<div class="container mt-4" *ngIf="!isLoading && video as vid; else loadingTpl">
 
-<div class="container mt-4" *ngIf="!isLoading && video; else loadingTpl">
-  <!-- Video Principal -->
-  <div class="video-main-section mb-4">
-    <div class="ratio ratio-16x9 mb-3">
-      <iframe
-        [src]="'https://www.youtube.com/embed/' + videoId | safeUrl"
-        allowfullscreen>
-      </iframe>
-    </div>
-    
-    <h4 class="video-title">{{ video.title }}</h4>
-    
-    <!-- Channel Info -->
-    <div class="channel-section d-flex align-items-center mb-3">
-      <img src="/placeholder.svg?height=40&width=40" alt="GreenEats" class="channel-avatar me-3">
-      <div class="flex-grow-1">
-        <h6 class="channel-name mb-0">GreenEats</h6>
-        <small class="text-muted">1.2M subscribers</small>
-      </div>
-      <button class="btn btn-danger btn-sm">Subscribe</button>
-    </div>
-    
-    <p class="text-muted mb-2">{{ video.publishedAt | date }} • 2.1M views</p>
-    
-    <!-- Tags -->
-    <div class="tags-section mb-3">
-      <span class="badge bg-light text-dark me-2">COOKING</span>
-      <span class="badge bg-light text-dark me-2">VEGAN</span>
-      <span class="badge bg-light text-dark me-2">RECIPES</span>
-      <span class="badge bg-light text-dark">HEALTHY</span>
-    </div>
-    
-    <!-- <button class="btn btn-sm btn-link p-0 mb-2"
-            (click)="descriptionCollapsed = !descriptionCollapsed">
-      {{ descriptionCollapsed ? 'Mostrar descripción' : 'Ocultar descripción' }}
-    </button> -->
-    <p  class="description-text">{{ video.description }}</p>
+  <!-- ▶ Player -->
+  <div class="ratio ratio-16x9 mb-3">
+    <iframe [src]="'https://www.youtube.com/embed/' + vid.videoId | safeUrl"
+            allowfullscreen title="YouTube player"></iframe>
   </div>
 
-  <!-- Related Videos Section -->
-  <div class="related-section mb-4">
-    <h5 class="section-title mb-3">Related Videos</h5>
-    <div class="row">
-      <div class="col-md-3 col-sm-6 mb-3" *ngFor="let rv of related.slice(0, 4)">
-        <div class="video-card" (click)="goTo(rv)" style="cursor: pointer">
-          <div class="video-thumbnail">
-            <img [src]="rv.thumbnail" [alt]="rv.title" class="img-fluid">
-            <div class="duration-badge">8:24</div>
-            <div class="channel-badge">
-              <img src="/placeholder.svg?height=24&width=24" alt="GreenEats" class="channel-icon">
-              <span>GreenEats</span>
-            </div>
-          </div>
-          <div class="video-info mt-2">
-            <h6 class="video-card-title">{{ rv.title }}</h6>
-            <small class="text-muted">views</small>
-          </div>
-        </div>
-      </div>
+  <!-- Título -->
+  <h4 class="video-title">{{ vid.title }}</h4>
+
+  <!-- Canal -->
+  <div class="d-flex align-items-center mb-2">
+    <img [src]="channelAvatarUrl" class="rounded-circle me-3" width="40" height="40" alt="avatar">
+    <div>
+      <h6 class="mb-0">{{ channelName }}</h6>
+      <small class="text-muted">{{ subscriberCount }}</small>
     </div>
   </div>
 
-  <!-- More from GreenEats Section -->
-  <div class="more-from-section">
-    <h5 class="section-title mb-3">More from GreenEats</h5>
-    <div class="row">
-      <div class="col-md-3 col-sm-6 mb-3" *ngFor="let rv of related.slice(4, 8)">
-        <div class="video-card" (click)="goTo(rv)" style="cursor: pointer">
-          <div class="video-thumbnail">
-            <img [src]="rv.thumbnail" [alt]="rv.title" class="img-fluid">
-            <div class="duration-badge">5:12</div>
-            <div class="youtube-badge">
-              <i class="fab fa-youtube"></i>
-              <span>YouTube</span>
-            </div>
-          </div>
-          <div class="video-info mt-2">
-            <h6 class="video-card-title">{{ rv.title }}</h6>
-            <small class="text-muted">views</small>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Fecha · visitas -->
+  <p class="text-muted mb-3">
+    {{ vid.publishedAt | date:'mediumDate' }} • {{ vid.viewCount | number:'1.0-0' }} views
+  </p>
+
+  <!-- Tags -->
+  <div class="mb-3" *ngIf="vid.tags?.length">
+    <span class="badge bg-light text-dark me-2" *ngFor="let t of vid.tags">{{ t }}</span>
   </div>
+
+  <!-- Descripción -->
+  <p class="white-space-pre">{{ vid.description }}</p>
+
+  <!-- Sliders -->
+  <app-slider *ngIf="related.length"
+              [title]="'Related videos'"
+              [items]="related"
+              [numVisible]="4"
+              [numScroll]="1"></app-slider>
+
+  <app-slider *ngIf="moreFromChannel.length"
+              [title]="'More from ' + channelName"
+              [items]="moreFromChannel"
+              [numVisible]="4"
+              [numScroll]="1"></app-slider>
 </div>
 
+<!-- Skeleton -->
 <ng-template #loadingTpl>
   <div class="container mt-4">
-    <!-- Skeleton Video Player -->
-    <div class="video-main-section mb-4">
-      <div class="skeleton-img ratio ratio-16x9 mb-3"></div>
-      <div class="skeleton-title mb-2"></div>
-      <div class="d-flex align-items-center mb-3">
-        <div class="skeleton-avatar me-3"></div>
-        <div class="flex-grow-1">
-          <div class="skeleton-text mb-1" style="width: 120px;"></div>
-          <div class="skeleton-text" style="width: 80px;"></div>
-        </div>
-        <div class="skeleton-button"></div>
-      </div>
-      <div class="skeleton-text mb-2" style="width: 200px;"></div>
-      <div class="skeleton-tags mb-3"></div>
-      <div class="skeleton-button mb-4"></div>
-      <div class="skeleton-text mb-1"></div>
-      <div class="skeleton-text" style="width: 90%;"></div>
-    </div>
-
-    <!-- Skeleton Related Videos -->
-    <div class="related-section mb-4">
-      <h5 class="section-title mb-3">Related Videos</h5>
-      <div class="row">
-        <div class="col-md-3 col-sm-6 mb-3" *ngFor="let i of [1,2,3,4]">
-          <div class="video-card">
-            <div class="skeleton-thumbnail mb-2"></div>
-            <div class="skeleton-text mb-1"></div>
-            <div class="skeleton-text" style="width: 70%;"></div>
-          </div>
-        </div>
+    <div class="ratio ratio-16x9 skeleton mb-3"></div>
+    <div class="skeleton h4 mb-2"></div>
+    <div class="d-flex align-items-center mb-2">
+      <div class="skeleton rounded-circle me-3" style="width:40px;height:40px"></div>
+      <div class="flex-grow-1">
+        <div class="skeleton mb-1" style="width:120px;height:14px"></div>
+        <div class="skeleton"      style="width:80px;height:12px"></div>
       </div>
     </div>
-
-    <!-- Skeleton More from GreenEats -->
-    <div class="more-from-section">
-      <h5 class="section-title mb-3">More from GreenEats</h5>
-      <div class="row">
-        <div class="col-md-3 col-sm-6 mb-3" *ngFor="let i of [1,2,3,4]">
-          <div class="video-card">
-            <div class="skeleton-thumbnail mb-2"></div>
-            <div class="skeleton-text mb-1"></div>
-            <div class="skeleton-text" style="width: 70%;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="skeleton mb-3" style="width:180px;height:12px"></div>
+    <div class="skeleton" style="height:80px;width:100%"></div>
   </div>
 </ng-template>

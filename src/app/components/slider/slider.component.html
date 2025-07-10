@@ -1,7 +1,7 @@
 <div class="slider-container">
   <!-- Cabecera del slider -->
   <div class="slider-header" *ngIf="title">
-    <h2>{{ title }}</h2>
+    <h1>{{ title }}</h1>
   </div>
 
   <!-- p-carousel de PrimeNG -->
@@ -44,9 +44,9 @@
             <h5 class="card-title">{{ item.title }}</h5>
             <!-- Nombre del creador -->
 
-            <div (click)="navigateToCreator(item.creatorId)" class="creator-info d-flex align-items-center">
-              <img [src]="item.creatorImage || 'assets/img/default-creator-profile.png'" alt="Perfil del creador" class="creator-profile" style="width:30px; height:30px; border-radius:50%;">
-              <span  class="ms-2 text-muted creator-name">{{ item.creator }}</span>
+            <div (click)="navigateToCreator(item.creatorId)" class="creator-info d-flex align-items-center mt-1">
+              <img [src]="item.creatorImage || 'assets/img/default-creator-profile.png'" alt="Perfil del creador" class="creator-profile me-2" style="width:30px; height:30px; border-radius:50%;">
+              <small class="text-muted mt-1">{{ item.creator }}</small>
             </div>
             <!-- Categorías -->
             <div class="mb-2">

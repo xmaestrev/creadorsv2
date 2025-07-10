@@ -1,64 +1,110 @@
-<div class="creator-container" *ngIf="!isLoading && creator; else skeletonLoader">
-  <!-- Información del creador -->
+<div class="creator-container" *ngIf="!isLoading && creator; else sk">
+  <!-- Header -->
   <div class="text-center mb-5">
-    <img [src]="creator.imageUrl && creator.imageUrl.trim() !== '' ? creator.imageUrl : 'assets/img/default-creator-profile.png'"
-         alt="Imagen del creador"
-         class="creator-image mb-3">
-    <h2 class="creator-name">{{ creator.name || 'NomCreador/a' }}</h2>
-    <p class="creator-description">
-      {{ creator.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit...' }}
-    </p>
-  </div>
-  
-  <!-- Slider de Clips de Twitch -->
-  <div class="videos-section" *ngIf="twitchClips && twitchClips.length > 0">
-    <app-slider [title]="'Clips de Twitch'"
-                [items]="twitchClips"
-                [numVisible]="4"
-                [numScroll]="1">
-    </app-slider>
+    <img
+      [src]="creator.imageUrl?.trim() ? creator.imageUrl : 'assets/img/default-creator-profile.png'"
+      class="creator-image mb-3"
+      alt="{{ creator.name }}"
+    />
+    <h2>{{ creator.name }}</h2>
+    <p class="text-muted">{{ creator.description }}</p>
   </div>
 
-  <!-- Slider de Vídeos de Twitch -->
-  <div class="videos-section" *ngIf="twitchVideos && twitchVideos.length > 0">
-    <app-slider [title]="'Vídeos de Twitch'"
-                [items]="twitchVideos"
-                [numVisible]="4"
-                [numScroll]="1">
-    </app-slider>
-  </div>
+  <!-- Secciones de contenido -->
+  <ng-container *ngFor="let section of [
+      { arr: twitchClips,   label: 'Clips de Twitch' },
+      { arr: twitchVideos,  label: 'Vídeos de Twitch' },
+      { arr: youtubeVideos, label: 'Vídeos de YouTube' }
+    ]">
+    <div *ngIf="section.arr?.length">
+      <h1>{{ section.label }}</h1>
 
-  <!-- Slider de Vídeos de YouTube (si existen) -->
-  <div class="videos-section" *ngIf="youtubeVideos && youtubeVideos.length > 0">
-    <app-slider [title]="'Vídeos de YouTube'"
-                [items]="youtubeVideos"
-                [numVisible]="4"
-                [numScroll]="1">
-    </app-slider>
-  </div>
-</div>
-
-<!-- Mensaje de carga -->
-<ng-template #skeletonLoader>
-  <div class="creator-container">
-    <!-- Esqueleto de cabecera -->
-    <div class="text-center mb-5">
-      <div class="skeleton-img rounded-circle mx-auto mb-3" style="width: 120px; height: 120px;"></div>
-      <div class="skeleton-title mx-auto mb-2" style="width: 50%; height: 24px;"></div>
-      <div class="skeleton-text mx-auto" style="width: 60%; height: 16px;"></div>
-    </div>
-
-    <!-- Esqueleto genérico para los sliders -->
-    <div *ngFor="let section of [1,2,3]" class="videos-section mb-4">
-      <div class="skeleton-title mb-3" style="width: 30%; height: 20px;"></div>
+      <!-- Primeros 4 -->
       <div class="row">
-        <div *ngFor="let i of [1,2,3,4]" class="col-md-3 mb-3">
-          <div class="skeleton-card">
-            <div class="skeleton-img" style="height: 180px;"></div>
-            <div class="skeleton-title mt-2" style="width: 80%; height: 20px;"></div>
-            <div class="skeleton-text mt-1" style="width: 60%; height: 14px;"></div>
+        <div
+          class="col-md-3 mb-4"
+          *ngFor="let v of section.arr.slice(0, first4)"
+        >
+          <div class="card h-100" (click)="open(v.url)" style="cursor:pointer">
+            <img [src]="v.thumbnail" class="card-img-top" alt="{{ v.title }}" />
+            <div class="card-body d-flex flex-column">
+              <h6 class="card-title mb-1">{{ v.title }}</h6>
+              <div class="d-flex align-items-center mb-1 mt-1">
+                <img
+                  [src]="v.creatorImage"
+                  class="rounded-circle me-2"
+                  width="24"
+                  height="24"
+                  alt="{{ v.creator }}"
+                />
+                <small class="text-muted">{{ v.creator }}</small>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Siguientes -->
+      <div class="row" *ngIf="section.arr.length > first4">
+        <div
+          class="col-md-3 mb-4"
+          *ngFor="let v of section.arr.slice(first4, displayed)"
+        >
+          <div class="card h-100" (click)="open(v.url)" style="cursor:pointer">
+            <img [src]="v.thumbnail" class="card-img-top" alt="{{ v.title }}" />
+            <div class="card-body p-2 d-flex flex-column">
+              <h6 class="card-title mb-1">{{ v.title }}</h6>
+              <div class="d-flex align-items-center mb-1">
+                <img
+                  [src]="v.creatorImage"
+                  class="rounded-circle me-2"
+                  width="24"
+                  height="24"
+                  alt="{{ v.creator }}"
+                />
+                <small class="text-muted">{{ v.creator }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón “Ver más vídeos” -->
+      <div class="text-center" *ngIf="section.arr.length > displayed">
+        <button class="btn btn-link" (click)="loadMore()">
+          Veure més vídeos
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #sk>
+  <!-- Loader header -->
+  <div class="text-center mb-5">
+    <div
+      class="skeleton-img rounded-circle mx-auto mb-3"
+      style="width:120px;height:120px"
+    ></div>
+    <div
+      class="skeleton-title mx-auto mb-2"
+      style="width:50%;height:24px"
+    ></div>
+    <div
+      class="skeleton-text mx-auto"
+      style="width:60%;height:16px"
+    ></div>
+  </div>
+
+  <!-- Loader grid -->
+  <div class="row">
+    <div
+      *ngFor="let i of [1,2,3,4,5,6,7,8]"
+      class="col-md-3 mb-4"
+    >
+      <div class="skeleton-card">
+        <div class="skeleton-img" style="height:180px"></div>
+        <div class="skeleton-title mt-2" style="width:80%;height:20px"></div>
       </div>
     </div>
   </div>
