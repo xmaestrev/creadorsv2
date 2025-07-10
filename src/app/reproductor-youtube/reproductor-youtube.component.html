@@ -1,63 +1,73 @@
 <div class="container mt-4" *ngIf="!isLoading && video as vid; else loadingTpl">
 
-  <!-- ▶ Player -->
+  <!-- ▶ reproductor -->
   <div class="ratio ratio-16x9 mb-3">
     <iframe [src]="'https://www.youtube.com/embed/' + vid.videoId | safeUrl"
-            allowfullscreen title="YouTube player"></iframe>
+            allowfullscreen></iframe>
   </div>
 
-  <!-- Título -->
+  <!-- título -->
   <h4 class="video-title">{{ vid.title }}</h4>
 
-  <!-- Canal -->
+  <!-- datos del canal -->
   <div class="d-flex align-items-center mb-2">
-    <img [src]="channelAvatarUrl" class="rounded-circle me-3" width="40" height="40" alt="avatar">
+    <img [src]="channelAvatarUrl"
+         [alt]="channelName"
+         class="rounded-circle me-3"
+         width="40" height="40">
     <div>
       <h6 class="mb-0">{{ channelName }}</h6>
       <small class="text-muted">{{ subscriberCount }}</small>
     </div>
   </div>
 
-  <!-- Fecha · visitas -->
+  <!-- fecha · vistas -->
   <p class="text-muted mb-3">
-    {{ vid.publishedAt | date:'mediumDate' }} • {{ vid.viewCount | number:'1.0-0' }} views
+    {{ vid.publishedAt | date:'mediumDate' }} • {{ vid.viewCount | number }} views
   </p>
 
-  <!-- Tags -->
+  <!-- tags -->
   <div class="mb-3" *ngIf="vid.tags?.length">
-    <span class="badge bg-light text-dark me-2" *ngFor="let t of vid.tags">{{ t }}</span>
+    <span class="badge bg-light text-dark me-2"
+          *ngFor="let t of vid.tags">{{ t }}</span>
   </div>
 
-  <!-- Descripción -->
-  <p class="white-space-pre">{{ vid.description }}</p>
+  <!-- descripción -->
+  <p class="description-text white-space-pre">{{ vid.description }}</p>
 
-  <!-- Sliders -->
+  <!-- vídeos relacionados -->
   <app-slider *ngIf="related.length"
-              [title]="'Related videos'"
+              [title]="'Vídeos relacionados · ' + channelName"
               [items]="related"
               [numVisible]="4"
-              [numScroll]="1"></app-slider>
+              [numScroll]="1">
+  </app-slider>
 
+  <!-- más del canal -->
   <app-slider *ngIf="moreFromChannel.length"
-              [title]="'More from ' + channelName"
+              [title]="'Més vídeos de ' + channelName"
               [items]="moreFromChannel"
               [numVisible]="4"
-              [numScroll]="1"></app-slider>
+              [numScroll]="1">
+  </app-slider>
+
 </div>
 
-<!-- Skeleton -->
+<!-- Skeleton mientras carga -->
 <ng-template #loadingTpl>
   <div class="container mt-4">
-    <div class="ratio ratio-16x9 skeleton mb-3"></div>
-    <div class="skeleton h4 mb-2"></div>
-    <div class="d-flex align-items-center mb-2">
-      <div class="skeleton rounded-circle me-3" style="width:40px;height:40px"></div>
+    <div class="skeleton-img ratio ratio-16x9 mb-3"></div>
+    <div class="skeleton-title mb-2"></div>
+    <div class="d-flex align-items-center mb-3">
+      <div class="skeleton-avatar me-3"></div>
       <div class="flex-grow-1">
-        <div class="skeleton mb-1" style="width:120px;height:14px"></div>
-        <div class="skeleton"      style="width:80px;height:12px"></div>
+        <div class="skeleton-text mb-1" style="width:120px"></div>
+        <div class="skeleton-text" style="width:80px"></div>
       </div>
     </div>
-    <div class="skeleton mb-3" style="width:180px;height:12px"></div>
-    <div class="skeleton" style="height:80px;width:100%"></div>
+    <div class="skeleton-text mb-2" style="width:200px"></div>
+    <div class="skeleton-tags mb-3"></div>
+    <div class="skeleton-text mb-1"></div>
+    <div class="skeleton-text" style="width:90%"></div>
   </div>
 </ng-template>
