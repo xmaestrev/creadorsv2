@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 // Ejemplo de interfaz mínima para Creator
 // Puedes crear archivos/interfaces más detalladas si deseas
@@ -43,7 +44,7 @@ export interface Video {
 export class CreatorsService {
   // Lo ideal es mover esta URL al fichero de environments si se usa Angular CLI
   // environment.ts o environment.prod.ts
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = environment.apiUrl
 
   private cachedCategories: any[] | null = null;
 
